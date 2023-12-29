@@ -1,0 +1,193 @@
+/* Add some basic styling */
+input {
+    width: 300px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+div {
+    margin-left: 10px;
+}
+.response-textarea {
+    width: 30%;
+    height: 15%;
+}
+.search-bar {
+    flex-grow: 1;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    left: 10%;
+    width: 50%;
+}
+.container {
+    position: relative;
+    text-align: center; /* Center-align items horizontally */
+}
+.container-header {
+    font-size: 18px; /* Sets the font size */
+    color: #4A4A4A; /* Sets the text color */
+    font-weight: bold; /* Ensures the text is bold, which <b> usually does by default */
+    padding: 5px 10px; /* Adds some padding around the text */
+    background-color: #EFEFEF; /* Sets a background color for the header */
+    border-bottom: 1px solid #D3D3D3; /* Adds a bottom border for a distinct look */
+    display: block; /* Makes the <b> tag behave like a block-level element */
+    margin-bottom: 10px; /* Adds some space below the header */
+}
+.group-section {
+    margin-bottom: 20px;
+}
+
+.group-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td {
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+.dropdown-menu {
+    top: 100%; /* Adjust if you need some space between the search bar and dropdown */
+    /*transform: translateX(-50%);*/
+    transform: translateX(calc(-30% ));
+    border: 1px solid #a19d9d;
+    padding: 10px;
+    position: absolute;
+    background-color: white;
+    width: 40%;
+    height: 70vh;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    overflow: auto;
+    left: 10%;
+}
+
+.group-header {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 5px 0;
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+.popup-inner {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    position: relative; /* This ensures that the close button is positioned relative to this container */
+    height: 80vh; /* Adjust the height as necessary */
+    max-height: 600px; /* Maximum height */
+    overflow: hidden; /* Prevent scrolling within the popup-inner */
+
+    width: 80%; /* Example: 80% of the viewport width */
+    max-width: 13000px; /* Example: max-width of 1000px */
+}
+/* Assuming the second column is the "Match" column */
+/*.popup-inner table th:nth-child(2),*/
+/*.popup-inner table td:nth-child(2) {*/
+/*    width: 50px;*/
+/*    !* Add any other styles for this column, e.g., text alignment *!*/
+/*}*/
+/*.popup-inner table th:nth-child(3),*/
+/*.popup-inner table td:nth-child(3) {*/
+/*    width: 120px;*/
+/*    !* Add any other styles for this column, e.g., text alignment *!*/
+/*}*/
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+.popup-title {
+    margin: 0;
+    font-weight: bold;
+}
+
+.popup-close-btn {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    cursor: pointer;
+}
+.popup-content {
+    text-align: left !important;
+    overflow-y: auto; /* Enable vertical scrolling within the content area */
+    height: calc(100% - 50px); /* Adjust height to account for the header */
+}
+
+.search-container {
+    display: flex; /* Aligns children (input and button) in a row */
+}
+
+.search-button {
+    border-top-left-radius: 0; /* Removes the left border-radius */
+    border-bottom-left-radius: 0; /* Removes the left border-radius */
+    /* Add other styles as needed */
+}
+.dropdown-menu-2 {
+    top: 100%; /* Adjust if you need some space between the search bar and dropdown */
+    /*transform: translateX(-50%);*/
+    transform: translateX(calc(-30% ));
+    border: 1px solid #a19d9d;
+    padding: 10px;
+    position: absolute;
+    background-color: white;
+    width: 40%;
+    height: 70vh;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    overflow: auto;
+    left: 10%;
+
+}
+
+.table-container {
+    width: 100%; /* Set the width of the table container */
+}
+
+.table-container table {
+    width: 100%; /* Set the width of the table to fill the container */
+    table-layout: fixed; /* Enable fixed table layout */
+}
+
+.table-container td {
+    vertical-align: top; /* Align content to the top of the cell */
+}
+
+/* Set specific widths for your columns if needed */
+.table-container .dropdown-menu {
+    width: 50%; /* Example fixed width for the first column */
+}
+
+.table-container .dropdown-menu-2 {
+    width: 50%; /* Example fixed width for the second column */
+}
