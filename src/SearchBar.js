@@ -34,11 +34,13 @@ const SearchBar = () => {
     const [login, setLogin] = useState(localStorage.getItem('login') || '');
     const [password, setPassword] = useState(localStorage.getItem('password') || '');
     const [url, setUrl] = useState(localStorage.getItem('url') || '');
+    const [pipeline, setPipeline] = useState(localStorage.getItem('pipeline') || '');
 
     useEffect(() => {
         setLogin(localStorage.getItem('login') || '');
         setPassword(localStorage.getItem('password') || '');
         setUrl(localStorage.getItem('url') || '');
+        setPipeline(localStorage.getItem('pipeline') || '');
     }, []);
 
     // Update localStorage whenever values change
@@ -46,6 +48,7 @@ const SearchBar = () => {
         localStorage.setItem('login', login);
         localStorage.setItem('password', password);
         localStorage.setItem('url', url);
+        localStorage.setItem('pipeline', pipeline);
     }, [login, password, url]);
 
     const debouncedTypeaheadSearch = useCallback(
@@ -99,6 +102,13 @@ const SearchBar = () => {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="url"
+                />
+                <input
+                    className="auth-input"
+                    type="text"
+                    value={pipeline}
+                    onChange={(e) => setPipeline(e.target.value)}
+                    placeholder="pipeline"
                 />
             </div>
             <div class="container">
@@ -333,27 +343,22 @@ async function fetchProxiedRequest(setDropdownData, setResponseText, entryCount,
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
     var url = localStorage.getItem('url') || '';
-    const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrl = `https://${url}/api/apps/mouser/query/mouser_typeahead_v2?q=${encodeURIComponent(searchQuery)}&debug=results&debug.explain.structured=true&fl=*,score&typeahead.collapse_key.enabled=true&typeahead.popular_search.enabled=true`;
+    var pipeline = localStorage.getItem('pipeline') || '';
+    // const proxyUrl = 'https://www.test-cors.org/'; // Replace with your actual proxy URL
+    // const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
+    // const targetUrl = `${url}/api/apps/mouser/query/${pipeline}?q=${searchQuery}&debug=results&debug.explain.structured=true&fl=*,score&typeahead.collapse_key.enabled=true&typeahead.popular_search.enabled=false`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/mouser-vrudom?q=${encodeURIComponent(searchQuery)}&debug=results&debug.explain.structured=true&fl=*,score&typeahead.collapse_key.enabled=true&typeahead.popular_search.enabled=false`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds
     try {
-        const response = await fetch(proxyUrl + targetUrl, {
+        const response = await fetch(targetUrl, {
+        // const response = await fetch(proxyUrl + targetUrl, {
             method: 'GET',
-            // mode: 'no-cors',
             headers: {
-                // 'Host':'mouser-dev.b.lucidworks.cloud:443',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Accept': '*/*',
                 'Authorization': `Basic ${encodedCredentials}`,
-                'Content-type': 'application/json',
-                'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'same-origin',
-                'Sec-Fetch-Dest': 'empty',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Host': 'www.mouser.pl'
             }
-            // Other fetch options
         });
 
         if (!response.ok) {
@@ -365,6 +370,7 @@ async function fetchProxiedRequest(setDropdownData, setResponseText, entryCount,
 
 
         const data = await response.json();
+        setResponseText(prevText =>  targetUrl);
         setDropdownData(data);
     } catch (error) {
         console.error('Fetch error:', error);
@@ -374,17 +380,22 @@ async function fetchProxiedRequest(setDropdownData, setResponseText, entryCount,
         setTitle(`${duration} ms`);
     }
 }
+
+
 async function fetchSearchRequest(query, setSearchResults, entryCount, setEntryCount, setTime, setResponseText) {
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
     var url = localStorage.getItem('url') || '';
+    var pipeline = localStorage.getItem('pipeline') || '';
     const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrl = `https://${url}/api/apps/mouser/query/mouser?q=${encodeURIComponent(query)}&debug=results&debug.explain.structured=true&fl=*,score`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/mouser-vrudom?q=${encodeURIComponent(query)}&debug=results&debug.explain.structured=true&fl=*,score`;
+    // const targetUrl = `https://${url}/api/apps/mouser/query/${pipeline}?q=${encodeURIComponent(query)}&debug=results&debug.explain.structured=true&fl=*,score`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds
     try {
-        const response = await fetch(proxyUrl + targetUrl, {
+        const response = await fetch(targetUrl, {
+        // const response = await fetch(proxyUrl + targetUrl, {
             method: 'GET',
             // mode: 'no-cors',
             headers: {
