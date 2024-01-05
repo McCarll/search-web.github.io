@@ -300,7 +300,7 @@ const Popup = ({ isOpen, onClose, selectedItemDebugInfo, selectedItemName }) => 
                 attributes['0'] = lines;
             }
             return {
-                name: data?.value?.toString() || '',
+                name: 'score: ' + data?.value?.toString() || '',
                 attributes: attributes,
                 children: data.details ? data.details.map(buildTree).filter(child => child) : []
             };
