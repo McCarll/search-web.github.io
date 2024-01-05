@@ -34,13 +34,13 @@ const SearchBar = () => {
     const [login, setLogin] = useState(localStorage.getItem('login') || '');
     const [password, setPassword] = useState(localStorage.getItem('password') || '');
     const [url, setUrl] = useState(localStorage.getItem('url') || '');
-    const [pipeline, setPipeline] = useState(localStorage.getItem('pipeline') || '');
+    const [pipeline, setPipeline] = useState(localStorage.getItem('pipeline') || 'mouser_typeahead_v2');
 
     useEffect(() => {
         setLogin(localStorage.getItem('login') || '');
         setPassword(localStorage.getItem('password') || '');
         setUrl(localStorage.getItem('url') || '');
-        setPipeline(localStorage.getItem('pipeline') || '');
+        setPipeline(localStorage.getItem('pipeline') || 'mouser_typeahead_v2');
     }, []);
 
     // Update localStorage whenever values change
@@ -54,7 +54,7 @@ const SearchBar = () => {
     const debouncedTypeaheadSearch = useCallback(
         debounce(async (query) => {
             if (query.length > 2) { // Only search if the user has typed more than 2 characters
-                await fetchProxiedRequest(setDropdownData, setResponseText, entryCount, setEntryCount, query, setTitle);
+                await fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, query, setTitle);
             }
         }, 300),
         [] // Dependency array, empty means the debounce function won't change
@@ -338,29 +338,33 @@ const Popup = ({ isOpen, onClose, selectedItemDebugInfo, selectedItemName }) => 
         </div>
     );
 };
-async function fetchProxiedRequest(setDropdownData, setResponseText, entryCount, setEntryCount, searchQuery, setTitle) {
+function getRandomNumber() {
+    return Math.floor(Math.random() * 1_000_000_000) + 1;
+}
+async function fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, searchQuery, setTitle) {
 
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
     var url = localStorage.getItem('url') || '';
     var pipeline = localStorage.getItem('pipeline') || '';
-    // const proxyUrl = 'https://www.test-cors.org/'; // Replace with your actual proxy URL
-    // const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    // const targetUrl = `${url}/api/apps/mouser/query/${pipeline}?q=${searchQuery}&debug=results&debug.explain.structured=true&fl=*,score&typeahead.collapse_key.enabled=true&typeahead.popular_search.enabled=false`;
-    const targetUrl = `https://${url}/api/apps/mouser/query/mouser-vrudom?q=${encodeURIComponent(searchQuery)}&debug=results&debug.explain.structured=true&fl=*,score&typeahead.collapse_key.enabled=true&typeahead.popular_search.enabled=false`;
+    const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
+
+    const targetUrl = `https://${url}/api/apps/mouser/query/${pipeline}?q=${searchQuery}&debug=results&debug.explain.structured=true&fl=*,score&typeahead.collapse_key.enabled=true&typeahead.popular_search.enabled=false&t=${getRandomNumber()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds
     try {
-        const response = await fetch(targetUrl, {
-        // const response = await fetch(proxyUrl + targetUrl, {
+        const response = await fetch(proxyUrl + targetUrl, {
             method: 'GET',
+            cache: 'reload',
             headers: {
                 'Accept': '*/*',
+                'Pragma':'no-cache',
+                'Cache-Control':'max-age=0',
                 'Authorization': `Basic ${encodedCredentials}`,
             }
         });
-
+        setEntryCount(entryCount+1);
         if (!response.ok) {
             const errorText = await response.text(); // Get the response text even if the response is not ok
             setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
@@ -370,7 +374,8 @@ async function fetchProxiedRequest(setDropdownData, setResponseText, entryCount,
 
 
         const data = await response.json();
-        setResponseText(prevText =>  targetUrl);
+        // todo debug window
+        // setResponseText(prevText =>  targetUrl);
         setDropdownData(data);
     } catch (error) {
         console.error('Fetch error:', error);
@@ -386,32 +391,26 @@ async function fetchSearchRequest(query, setSearchResults, entryCount, setEntryC
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
     var url = localStorage.getItem('url') || '';
-    var pipeline = localStorage.getItem('pipeline') || '';
     const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrl = `https://${url}/api/apps/mouser/query/mouser-vrudom?q=${encodeURIComponent(query)}&debug=results&debug.explain.structured=true&fl=*,score`;
-    // const targetUrl = `https://${url}/api/apps/mouser/query/${pipeline}?q=${encodeURIComponent(query)}&debug=results&debug.explain.structured=true&fl=*,score`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/mouser?q=${query}&debug=results&debug.explain.structured=true&fl=*,score&t=${getRandomNumber()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds
     try {
-        const response = await fetch(targetUrl, {
-        // const response = await fetch(proxyUrl + targetUrl, {
+        const response = await fetch(proxyUrl + targetUrl, {
             method: 'GET',
-            // mode: 'no-cors',
+            cache: 'no-cache',
             headers: {
-                // 'Host':'mouser-dev.b.lucidworks.cloud:443',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Pragma':'no-cache',
+                'Cache-Control':'max-age=0',
                 'Authorization': `Basic ${encodedCredentials}`,
-                'Content-type': 'application/json',
-                'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'same-origin',
-                'Sec-Fetch-Dest': 'empty',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Host': 'www.mouser.pl'
+                'Content-type': '*/*',
             }
-            // Other fetch options
         });
-
+        if (entryCount > 1_000_000_000){
+            await setEntryCount(0);
+        }
         if (!response.ok) {
             const errorText = await response.text(); // Get the response text even if the response is not ok
             setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
@@ -422,9 +421,6 @@ async function fetchSearchRequest(query, setSearchResults, entryCount, setEntryC
 
         const data = await response.json();
         setSearchResults(data);
-        // setDebugData(data.debug);
-        // setSuggestions(data);
-        // setResponseText(''); // Clear any previous error message
     } catch (error) {
         console.error('Fetch error:', error);
     } finally {
