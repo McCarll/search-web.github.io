@@ -1,11 +1,13 @@
 import './SearchBar.css';
 import debounce from 'lodash.debounce';
-import {useCallback, useContext, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 import './TreeView.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {AuthContext} from "./AuthProvider"; // Default styles, dark mode available with 'dark.css'
+import { ForceGraph2D } from 'react-force-graph';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import {AuthContext} from "./AuthProvider";
+import Tree from "react-d3-tree"; // Default styles, dark mode available with 'dark.css'
 
 // import { AuthContext } from './AuthProvider';
 
@@ -124,7 +126,6 @@ const SearchBar = () => {
                     <table>
                         <tbody>
                         <tr>
-                            {/* First column for dropdown data */}
                             <td><b>Type ahead menu</b>
                                 {dropdownData && (
                                     <>
@@ -216,20 +217,8 @@ const SearchBar = () => {
 };
 const RecsRequest = ({isRecsPopupOpen, onClose, recsRequest}) => {
     if (!isRecsPopupOpen) return null;
-
 }
 
-function getBoostValue(description) {
-    const regex = /\^(\d+(\.\d+)?)/;
-    const match = description.match(regex);
-
-    if (match) {
-        return match[1]; // '2.0'
-    }
-}
-
-
-// const SearchPopup = ({ onClose, selectedItemInfo, selectedItemInfoName}) => {
 const SearchPopup = ({isSearchPopupOpen, onClose, selectedItemInfo, selectedItemInfoName}) => {
     if (!isSearchPopupOpen) return null;
     return (
@@ -262,38 +251,56 @@ const SearchPopup = ({isSearchPopupOpen, onClose, selectedItemInfo, selectedItem
         </div>
     );
 }
-const renderTreeRows = (data, level = 0) => {
-    const rows = [];
 
-    // Check if the node should be skipped based on its description
-    const skipNode = data.description.includes('sum of') || data.description.includes('max of');
+function wrap( line ) {
+    const MAX_CHARS_PER_LINE = 30;
+    let lines = [];
+    let currentLine = '';
 
-    if (!skipNode) {
-        // Add the current node's row if not skipped
-        rows.push(
-            <tr key={`level-${level}-${data.description}`}>
-                <td style={{ paddingLeft: `${level * 20}px` }}>{data.description}</td>
-                <td width="50">{data.match?.toString()}</td>
-                <td>{data.value}</td>
-            </tr>
-        );
+    for (const char of line) {
+        if (currentLine.length + 1 <= MAX_CHARS_PER_LINE) {
+            currentLine += char;
+        } else {
+            lines.push(currentLine);
+            currentLine = char;
+        }
     }
 
-    // If there are children, recursively render them
-    if (Array.isArray(data.details) && data.details.length > 0) {
-        data.details.forEach((child) => {
-            const childRows = renderTreeRows(child, skipNode ? level : level + 1);
-            if (childRows) {
-                rows.push(...childRows);
-            }
-        });
+    // Add the last line if it's not empty
+    if (currentLine) {
+        lines.push(currentLine);
     }
-
-    return rows.length > 0 ? rows : null;
-};
-
-
+    return lines;
+}
 const Popup = ({ isOpen, onClose, selectedItemDebugInfo, selectedItemName }) => {
+    const [treeData, setTreeData] = useState([]);
+
+    useEffect(() => {
+        const buildTree = (data) => {
+            console.log("Processing data:", data);
+            if (!data) return null; // Check if data is undefined or null
+            const lines = wrap(data?.description?.toString() || '');
+            const attributes = {
+            };
+            if (Array.isArray(lines)){
+                lines.forEach((line, index) => {
+                    attributes[`${index + 1}`] = line;
+                });
+            }else {
+                attributes['0'] = lines;
+            }
+            return {
+                name: data?.value?.toString() || '',
+                attributes: attributes,
+                children: data.details ? data.details.map(buildTree).filter(child => child) : []
+            };
+        };
+
+        if (selectedItemDebugInfo) {
+            const root = buildTree(selectedItemDebugInfo);
+            setTreeData([root]);
+        }
+    }, [selectedItemDebugInfo]);
     if (!isOpen) return null;
     return (
         <div className="popup">
@@ -302,113 +309,32 @@ const Popup = ({ isOpen, onClose, selectedItemDebugInfo, selectedItemName }) => 
                     <span className="popup-title">Debug Info</span>
                     <button className="popup-close-btn" onClick={onClose}>X</button>
                 </div>
-                <div className="popup-content">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th width="50">Match</th>
-                            <th>Value</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {selectedItemDebugInfo.details && selectedItemDebugInfo.details.map((detail, index) =>
-                            renderTreeRows(detail, 0)
-                        )}
-                        </tbody>
-                    </table>
+                <div className="popup-content" >
+                    {treeData.length > 0 && (
+                        <Tree
+                            data={treeData}
+                            orientation="vertical"
+                            translate={{x: 250, y: 50}}
+                            collapsible={true}
+                            zoomable={true}
+                            pathFunc="step"
+                            nodeSize={{ x: 100, y: 100 }} // Adjust the x and y values as needed
+                            separation={{ siblings: 5, nonSiblings: 3 }} // Adjust the separation between nodes
+                            depthFactor={200}
+                        />
+                    )}
                 </div>
             </div>
         </div>
     );
 };
-
-const Popup2 = ({isOpen, onClose, selectedItemDebugInfo, selectedItemName}) => {
-    if (!isOpen) return null;
-
-    return (
-
-        <div className="popup">
-            <div className="popup-inner">
-                <div className="popup-header">
-                    <span className="popup-title">Debug explain</span>
-                    <button className="popup-close-btn" onClick={onClose}>X</button>
-                </div>
-                <div className="popup-content">
-                    <table>
-                        <tr>
-                            <td>match</td>
-                            <td>{selectedItemDebugInfo?.match + ""}</td>
-                        </tr>
-                        <tr>
-                            <td>total score</td>
-                            <td>{selectedItemDebugInfo?.value}</td>
-                        </tr>
-                        {
-
-                            selectedItemName?.split(" ").length > 1 &&
-                            selectedItemDebugInfo.details[0].details[0].details[0].details.map((detail, i) => (
-                                <tr key={i}>
-                                    <td>word info: {getSearchableWord(detail.description)}</td>
-                                    <td>word score: {detail.value}</td>
-                                    <td>word match: {detail.match + " "}</td>
-                                </tr>
-                            ))
-                        }
-                        {
-
-                            selectedItemName?.split(" ").length > 1 &&
-                            selectedItemDebugInfo.details[0].details[0].details.map((detail, i) => (
-                                <tr key={i}>
-                                    <td>word info: {getSearchableWord(detail.description)}</td>
-                                    <td>word score: {detail.value}</td>
-                                    <td>word match: {detail.match + " "}</td>
-                                </tr>
-                            ))
-                        }
-                        {
-                            selectedItemName?.split(" ").length == 1 &&
-                            selectedItemDebugInfo.details[0].details[0].details.map((detail, i) => (
-                                <tr key={i}>
-                                    <td>word info: {getSearchableWord(detail.description)}</td>
-                                    <td>word score: {detail.value}</td>
-                                    <td>word match: {detail.match + " "}</td>
-                                </tr>
-                            ))
-                        }
-                        <tr>
-                            {selectedItemDebugInfo.details?.[1] && (
-                                <td>suggestion boost: {getBoostValue(selectedItemDebugInfo.details[1].description)}</td>
-                            )}
-                        </tr>
-                    </table>
-                    <JsonView src={selectedItemDebugInfo} collapsed={true} className="custom-json-view"/>
-                </div>
-            </div>
-        </div>
-    );
-
-};
-
-
-function getSearchableWord(word) {
-    const regex = ':(\\w+)';
-    // const regex = /searchable_suggestions_edge:(\w+)/;
-    const match = word.match(regex);
-
-    if (match) {
-        return match[1];
-    }
-    return word;
-}
-
 async function fetchProxiedRequest(setDropdownData, setResponseText, entryCount, setEntryCount, searchQuery, setTitle) {
 
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
     var url = localStorage.getItem('url') || '';
     const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrl = `https://${url}/api/apps/mouser/query/mouser_typeahead_v2?q=${encodeURIComponent(searchQuery)}&debug=results&debug.explain.structured=true&fl=*,score`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/mouser_typeahead_v2?q=${encodeURIComponent(searchQuery)}&debug=results&debug.explain.structured=true&fl=*,score&typeahead.collapse_key.enabled=true&typeahead.popular_search.enabled=true`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds

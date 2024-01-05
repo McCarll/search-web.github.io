@@ -87,8 +87,8 @@ li {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
@@ -100,25 +100,13 @@ li {
     background: white;
     padding: 20px;
     border-radius: 5px;
-    position: relative; /* This ensures that the close button is positioned relative to this container */
-    height: 80vh; /* Adjust the height as necessary */
-    max-height: 600px; /* Maximum height */
-    overflow: hidden; /* Prevent scrolling within the popup-inner */
-
-    width: 80%; /* Example: 80% of the viewport width */
-    max-width: 13000px; /* Example: max-width of 1000px */
+    position: relative;
+    width: 80%; /* Adjust the width as necessary */
+    height: 80vh; /* Use a percentage of the viewport height */
+    overflow: auto; /* Enable scrolling */
+    resize: both; /* Enable resizing */
 }
-/* Assuming the second column is the "Match" column */
-/*.popup-inner table th:nth-child(2),*/
-/*.popup-inner table td:nth-child(2) {*/
-/*    width: 50px;*/
-/*    !* Add any other styles for this column, e.g., text alignment *!*/
-/*}*/
-/*.popup-inner table th:nth-child(3),*/
-/*.popup-inner table td:nth-child(3) {*/
-/*    width: 120px;*/
-/*    !* Add any other styles for this column, e.g., text alignment *!*/
-/*}*/
+
 .popup-header {
     display: flex;
     justify-content: space-between;
@@ -139,9 +127,9 @@ li {
     cursor: pointer;
 }
 .popup-content {
-    text-align: left !important;
-    overflow-y: auto; /* Enable vertical scrolling within the content area */
-    height: calc(100% - 50px); /* Adjust height to account for the header */
+    width: 100%; /* Full width of the container */
+    height: 100%; /* Full height of the container */
+    overflow: auto; /* Enable scrolling inside the content area if needed */
 }
 
 .search-container {
@@ -190,4 +178,13 @@ li {
 
 .table-container .dropdown-menu-2 {
     width: 50%; /* Example fixed width for the second column */
+}
+.myNodeLabel {
+    display: inline-block; /* or block */
+    width: 150px; /* Adjust as needed */
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal; /* Ensures text wraps */
+    text-align: center; /* Optional: for center alignment */
+    font-size: 12px; /* Adjust as needed */
 }
