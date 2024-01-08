@@ -349,7 +349,7 @@ async function fetchTypeAheadRequest(setDropdownData, setResponseText, entryCoun
     var pipeline = localStorage.getItem('pipeline') || '';
     const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
 
-    const targetUrl = `https://${url}/api/apps/mouser/query/${pipeline}?q=${searchQuery}&debug=results&debug.explain.structured=true&fl=*,score&typeahead.collapse_key.enabled=true&typeahead.popular_search.enabled=false&t=${getRandomNumber()}`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/${pipeline}?q=${searchQuery}&debug=results&debug.explain.structured=true&fl=*,score&t=${getRandomNumber()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds
