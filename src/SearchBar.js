@@ -49,7 +49,7 @@ const SearchBar = () => {
         localStorage.setItem('password', password);
         localStorage.setItem('url', url);
         localStorage.setItem('pipeline', pipeline);
-    }, [login, password, url]);
+    }, [login, password, url, pipeline]);
 
     const debouncedTypeaheadSearch = useCallback(
         debounce(async (query) => {
