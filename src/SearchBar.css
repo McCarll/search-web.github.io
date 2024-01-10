@@ -9,8 +9,9 @@ div {
     margin-left: 10px;
 }
 .response-textarea {
-    width: 30%;
-    height: 15%;
+    width: 100%;
+    /*height: 15%;*/
+    box-sizing: border-box;
 }
 .search-bar {
     flex-grow: 1;
@@ -187,4 +188,30 @@ li {
     white-space: normal; /* Ensures text wraps */
     text-align: center; /* Optional: for center alignment */
     font-size: 12px; /* Adjust as needed */
+}
+.auth-table {
+    width: 30%;
+    position: relative; /* Adjust based on your layout needs */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/* Setting column widths */
+.auth-table th, .auth-table td {
+    /* Example: setting the first column to be 200px wide */
+    width: 200px;
+}
+/*.auth-table td:nth-child(0), .auth-table td:nth-child(0) {*/
+/*    width: 10px; !* Width of the first column *!*/
+/*}*/
+.auth-table td:nth-child(0){
+    width: 10px;
+}
+.top_div {
+    display: flex;
+    align-items: flex-start; /* Aligns items at the top */
+}
+.error-response-div {
+    margin-left: 20px;
 }

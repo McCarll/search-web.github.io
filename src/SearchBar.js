@@ -4,13 +4,12 @@ import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 import './TreeView.css';
-import { ForceGraph2D } from 'react-force-graph';
+import {ForceGraph2D} from 'react-force-graph';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import {AuthContext} from "./AuthProvider";
 import Tree from "react-d3-tree"; // Default styles, dark mode available with 'dark.css'
 
 // import { AuthContext } from './AuthProvider';
-
 
 
 const SearchBar = () => {
@@ -35,6 +34,8 @@ const SearchBar = () => {
     const [password, setPassword] = useState(localStorage.getItem('password') || '');
     const [url, setUrl] = useState(localStorage.getItem('url') || '');
     const [pipeline, setPipeline] = useState(localStorage.getItem('pipeline') || 'mouser_typeahead_v2');
+    const [requestQuery, setRequestQuery] = useState('');
+    // const [solr_query_typeahead, setSolr_query_typeahead] = useState('');
 
     useEffect(() => {
         setLogin(localStorage.getItem('login') || '');
@@ -54,7 +55,7 @@ const SearchBar = () => {
     const debouncedTypeaheadSearch = useCallback(
         debounce(async (query) => {
             if (query.length > 2) { // Only search if the user has typed more than 2 characters
-                await fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, query, setTitle);
+                await fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, query, setTitle, setRequestQuery);
             }
         }, 300),
         [] // Dependency array, empty means the debounce function won't change
@@ -62,7 +63,7 @@ const SearchBar = () => {
     const debouncedSearch = useCallback(
         debounce(async (query) => {
             if (query.searchQuery.length > 2) { // Only search if the user has typed more than 2 characters
-                await fetchSearchRequest(query.searchQuery, setSearchResults, entryCount, setEntryCount, setTime, setResponseText, time);
+                await fetchSearchRequest(query.searchQuery, setSearchResults, entryCount, setEntryCount, setTime, setResponseText, time, setRequestQuery);
             }
         }, 300),
         [] // Dependency array, empty means the debounce function won't change
@@ -81,45 +82,96 @@ const SearchBar = () => {
 
     return (
         <div>
-            <div>
-                <input
-                    className="auth-input"
-                    type="text"
-                    value={login}
-                    onChange={(e) => setLogin(e.target.value)}
-                    placeholder="login"
-                />
-                <input
-                    className="auth-input"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="password"
-                />
-                <input
-                    className="auth-input"
-                    type="text"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    placeholder="url"
-                />
-                <input
-                    className="auth-input"
-                    type="text"
-                    value={pipeline}
-                    onChange={(e) => setPipeline(e.target.value)}
-                    placeholder="pipeline"
-                />
+            <div className="top_div">
+
+
+                <table className="auth-table">
+                    <tbody>
+                    <th>request pattern:: https://<u>URL</u>/api/apps/app_name/query/<u>PROFILE</u>?q=<u>query</u></th>
+                    <tr>
+                        <td>
+                            <b>login</b>
+                        </td>
+                        <td>
+                            <input
+                                className="auth-input"
+                                type="text"
+                                value={login}
+                                onChange={(e) => setLogin(e.target.value)}
+                                placeholder="login"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>password</td>
+                        <td>
+                            <input
+                                className="auth-input"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="password"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>url</td>
+                        <td>
+                            <input
+                                className="auth-input"
+                                type="text"
+                                value={url}
+                                onChange={(e) => setUrl(e.target.value)}
+                                placeholder="url"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>profile</td>
+                        <td>
+                            <input
+                                title={"Profile name"}
+                                className="auth-input"
+                                type="text"
+                                value={pipeline}
+                                onChange={(e) => setPipeline(e.target.value)}
+                                placeholder="pipeline"
+                            />
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+                </table>
+
+
+                <table>
+                    <tbody>
+                    <tr>
+                        <div className="error_response_div">
+                        <textarea
+                            className="response-textarea"
+                            value={responseText}
+                            placeholder="Errors will be here"
+                            rows={10}
+                            readOnly
+                        />
+                        </div>
+                    </tr>
+                    <div>
+                        <textarea
+                            className="response-textarea"
+                            value={requestQuery}
+                            placeholder="requests will here"
+                            rows={10}
+                            readOnly
+
+                        />
+                    </div>
+                    </tbody>
+                </table>
             </div>
             <div class="container">
-                <textarea
-                    className="response-textarea"
-                    value={responseText}
-                    placeholder="Errors will be here"
-                    rows={10}
-                    readOnly
-                />
-
                 <div className="search-container">
                     <input
                         className="search-bar"
@@ -152,7 +204,7 @@ const SearchBar = () => {
                                                                 setSelectedItemName(doc.display_name);
                                                                 setIsPopupOpen(true);
                                                             }}>{doc.display_name}</td>
-                                                            <td>{doc.score}</td>
+                                                            <td width={150}>{doc.score}</td>
                                                         </tr>
                                                     ))}
                                                     </tbody>
@@ -203,6 +255,7 @@ const SearchBar = () => {
                                         </table>
                                     </>
                                 )}
+
                                 <SearchPopup
                                     isSearchPopupOpen={isSearchPopupOpen}
                                     onClose={() => setIsSearchPopupOpen(false)}
@@ -215,6 +268,15 @@ const SearchBar = () => {
                                     recsRequest={recsRequest}
                                 />
                             </td>
+                            <td>Fusion debug
+                                {dropdownData && (
+
+
+                                    <JsonView src={dropdownData.responseHeader.params} collapsed={true}
+                                              className="custom-json-view"/>
+
+                                )}
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -223,7 +285,8 @@ const SearchBar = () => {
             </div>
 
         </div>
-    );
+    )
+        ;
 };
 const RecsRequest = ({isRecsPopupOpen, onClose, recsRequest}) => {
     if (!isRecsPopupOpen) return null;
@@ -262,7 +325,7 @@ const SearchPopup = ({isSearchPopupOpen, onClose, selectedItemInfo, selectedItem
     );
 }
 
-function wrap( line ) {
+function wrap(line) {
     const MAX_CHARS_PER_LINE = 30;
     let lines = [];
     let currentLine = '';
@@ -282,7 +345,8 @@ function wrap( line ) {
     }
     return lines;
 }
-const Popup = ({ isOpen, onClose, selectedItemDebugInfo, selectedItemName }) => {
+
+const Popup = ({isOpen, onClose, selectedItemDebugInfo, selectedItemName}) => {
     const [treeData, setTreeData] = useState([]);
 
     useEffect(() => {
@@ -290,13 +354,12 @@ const Popup = ({ isOpen, onClose, selectedItemDebugInfo, selectedItemName }) => 
             console.log("Processing data:", data);
             if (!data) return null; // Check if data is undefined or null
             const lines = wrap(data?.description?.toString() || '');
-            const attributes = {
-            };
-            if (Array.isArray(lines)){
+            const attributes = {};
+            if (Array.isArray(lines)) {
                 lines.forEach((line, index) => {
                     attributes[`${index + 1}`] = line;
                 });
-            }else {
+            } else {
                 attributes['0'] = lines;
             }
             return {
@@ -319,7 +382,7 @@ const Popup = ({ isOpen, onClose, selectedItemDebugInfo, selectedItemName }) => 
                     <span className="popup-title">Debug Info</span>
                     <button className="popup-close-btn" onClick={onClose}>X</button>
                 </div>
-                <div className="popup-content" >
+                <div className="popup-content">
                     {treeData.length > 0 && (
                         <Tree
                             data={treeData}
@@ -328,8 +391,8 @@ const Popup = ({ isOpen, onClose, selectedItemDebugInfo, selectedItemName }) => 
                             collapsible={true}
                             zoomable={true}
                             pathFunc="step"
-                            nodeSize={{ x: 100, y: 100 }} // Adjust the x and y values as needed
-                            separation={{ siblings: 5, nonSiblings: 3 }} // Adjust the separation between nodes
+                            nodeSize={{x: 100, y: 100}} // Adjust the x and y values as needed
+                            separation={{siblings: 5, nonSiblings: 3}} // Adjust the separation between nodes
                             depthFactor={200}
                         />
                     )}
@@ -338,10 +401,12 @@ const Popup = ({ isOpen, onClose, selectedItemDebugInfo, selectedItemName }) => 
         </div>
     );
 };
+
 function getRandomNumber() {
     return Math.floor(Math.random() * 1_000_000_000) + 1;
 }
-async function fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, searchQuery, setTitle) {
+
+async function fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, searchQuery, setTitle, setRequestQuery) {
 
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
@@ -349,7 +414,7 @@ async function fetchTypeAheadRequest(setDropdownData, setResponseText, entryCoun
     var pipeline = localStorage.getItem('pipeline') || '';
     const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
 
-    const targetUrl = `https://${url}/api/apps/mouser/query/${pipeline}?q=${searchQuery}&debug=results&debug.explain.structured=true&fl=*,score&t=${getRandomNumber()}`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/${pipeline}?q=${searchQuery}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds
@@ -359,12 +424,14 @@ async function fetchTypeAheadRequest(setDropdownData, setResponseText, entryCoun
             cache: 'reload',
             headers: {
                 'Accept': '*/*',
-                'Pragma':'no-cache',
-                'Cache-Control':'max-age=0',
+                'Pragma': 'no-cache',
+                'Cache-Control': 'max-age=0',
                 'Authorization': `Basic ${encodedCredentials}`,
             }
         });
-        setEntryCount(entryCount+1);
+        // eslint-disable-next-line no-useless-concat
+        setRequestQuery(prev => "typeahead: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n \n" + `${prev}`);
+        setEntryCount(entryCount + 1);
         if (!response.ok) {
             const errorText = await response.text(); // Get the response text even if the response is not ok
             setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
@@ -387,12 +454,12 @@ async function fetchTypeAheadRequest(setDropdownData, setResponseText, entryCoun
 }
 
 
-async function fetchSearchRequest(query, setSearchResults, entryCount, setEntryCount, setTime, setResponseText) {
+async function fetchSearchRequest(query, setSearchResults, entryCount, setEntryCount, setTime, setResponseText,time, setRequestQuery) {
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
     var url = localStorage.getItem('url') || '';
     const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrl = `https://${url}/api/apps/mouser/query/mouser?q=${query}&debug=results&debug.explain.structured=true&fl=*,score&t=${getRandomNumber()}`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/mouser?q=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds
@@ -402,15 +469,18 @@ async function fetchSearchRequest(query, setSearchResults, entryCount, setEntryC
             cache: 'no-cache',
             headers: {
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                'Pragma':'no-cache',
-                'Cache-Control':'max-age=0',
+                'Pragma': 'no-cache',
+                'Cache-Control': 'max-age=0',
                 'Authorization': `Basic ${encodedCredentials}`,
                 'Content-type': '*/*',
             }
         });
-        if (entryCount > 1_000_000_000){
+        if (entryCount > 1_000_000_000) {
             await setEntryCount(0);
         }
+        // eslint-disable-next-line no-useless-concat
+        setRequestQuery(prev => "search: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n \n" + `${prev}`);
+        // setRequestQuery(prev => "search: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n" + `${prev}`);
         if (!response.ok) {
             const errorText = await response.text(); // Get the response text even if the response is not ok
             setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
