@@ -30,18 +30,22 @@ const SearchBar = () => {
     const [isRecsPopupOpen, setIsRecsPopupOpen] = useState(false);
 // eslint-disable-next-line react-hooks/rules-of-hooks
     // Initialize state with values from localStorage or default to empty strings
-    const [login, setLogin] = useState(localStorage.getItem('login') || '');
-    const [password, setPassword] = useState(localStorage.getItem('password') || '');
-    const [url, setUrl] = useState(localStorage.getItem('url') || '');
-    const [pipeline, setPipeline] = useState(localStorage.getItem('pipeline') || 'mouser_typeahead_v2');
+    const [login, setLogin] = useState(localStorage.getItem('login'));
+    const [password, setPassword] = useState(localStorage.getItem('password'));
+    const [url, setUrl] = useState(localStorage.getItem('url'));
+    const [pipeline, setPipeline] = useState(localStorage.getItem('pipeline') );
+    const [searchProfile, setSearchProfile] = useState(localStorage.getItem('searchProfile'));
+    const [recsProfile, setRecsProfile] = useState(localStorage.getItem('recsProfile'));
     const [requestQuery, setRequestQuery] = useState('');
-    // const [solr_query_typeahead, setSolr_query_typeahead] = useState('');
+    const [recsResponse, setRecsResponse] = useState('');
 
     useEffect(() => {
-        setLogin(localStorage.getItem('login') || '');
-        setPassword(localStorage.getItem('password') || '');
-        setUrl(localStorage.getItem('url') || '');
-        setPipeline(localStorage.getItem('pipeline') || 'mouser_typeahead_v2');
+        setLogin(localStorage.getItem('login'));
+        setPassword(localStorage.getItem('password'));
+        setUrl(localStorage.getItem('url'));
+        setPipeline(localStorage.getItem('pipeline'));
+        setSearchProfile(localStorage.getItem('searchProfile'));
+        setRecsProfile(localStorage.getItem('recsProfile'));
     }, []);
 
     // Update localStorage whenever values change
@@ -50,9 +54,11 @@ const SearchBar = () => {
         localStorage.setItem('password', password);
         localStorage.setItem('url', url);
         localStorage.setItem('pipeline', pipeline);
-    }, [login, password, url, pipeline]);
+        localStorage.setItem('recsProfile', recsProfile)
+        localStorage.setItem('searchProfile', searchProfile)
+    }, [login, password, url, pipeline, recsProfile, searchProfile]);
 
-    const debouncedTypeaheadSearch = useCallback(
+        const debouncedTypeaheadSearch = useCallback(
         debounce(async (query) => {
             if (query.length > 2) { // Only search if the user has typed more than 2 characters
                 await fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, query, setTitle, setRequestQuery);
@@ -68,6 +74,12 @@ const SearchBar = () => {
         }, 300),
         [] // Dependency array, empty means the debounce function won't change
     );
+    const debouncedRecsSearch = useCallback(
+        debounce(async (query) => {
+            await fetchSearchRecsRequest(query, setRecsResponse, entryCount, setEntryCount, setTime, setResponseText, time, setRequestQuery);
+        }, 300),
+        [] // Dependency array, empty means the debounce function won't change
+    );
 
     const handleSearch = (e) => {
         const value = e.target.value;
@@ -79,12 +91,15 @@ const SearchBar = () => {
         console.log("getSearchResults:: " + value);
         debouncedSearch(value);
     };
+    const getSearchRecsResults = (e) => {
+        // const value = {recsRequest};
+        console.log("getSearchRecResults:: " + e);
+        debouncedRecsSearch(e);
+    };
 
     return (
         <div>
             <div className="top_div">
-
-
                 <table className="auth-table">
                     <tbody>
                     <th>request pattern:: https://<u>URL</u>/api/apps/app_name/query/<u>PROFILE</u>?q=<u>query</u></th>
@@ -127,18 +142,43 @@ const SearchBar = () => {
                         </td>
                     </tr>
                     <tr>
-                        <td>profile</td>
+                        <td>typeahead profile</td>
                         <td>
                             <input
-                                title={"Profile name"}
+                                title={"Typeahead profile"}
                                 className="auth-input"
                                 type="text"
                                 value={pipeline}
                                 onChange={(e) => setPipeline(e.target.value)}
-                                placeholder="pipeline"
+                                placeholder="typeahead profile"
                             />
                         </td>
-
+                    </tr>
+                    <tr>
+                        <td>search profile</td>
+                        <td>
+                            <input
+                                title={"Search profile"}
+                                className="auth-input"
+                                type="text"
+                                value={searchProfile}
+                                onChange={(e) => setSearchProfile(e.target.value)}
+                                placeholder="search profile"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>recommendation<br/> profile</td>
+                        <td>
+                            <input
+                                title={"Recs profile"}
+                                className="auth-input"
+                                type="text"
+                                value={recsProfile}
+                                onChange={(e) => setRecsProfile(e.target.value)}
+                                placeholder="recs profile"
+                            />
+                        </td>
                     </tr>
 
                     </tbody>
@@ -165,7 +205,6 @@ const SearchBar = () => {
                             placeholder="requests will here"
                             rows={10}
                             readOnly
-
                         />
                     </div>
                     </tbody>
@@ -239,6 +278,7 @@ const SearchBar = () => {
                                                     <td onClick={() => {
                                                         setRecsRequest(doc.ProductId_l);
                                                         setIsRecsPopupOpen(true);
+                                                        getSearchRecsResults(doc.ProductId_l)
                                                     }
                                                     }>recs
                                                     </td>
@@ -264,14 +304,13 @@ const SearchBar = () => {
                                 />
                                 <RecsRequest
                                     isRecsPopupOpen={isRecsPopupOpen}
-                                    onClose={() => setIsSearchPopupOpen(false)}
-                                    recsRequest={recsRequest}
+                                    onClose={() => setIsRecsPopupOpen(false)}
+                                    recsResponse={recsResponse}
                                 />
+
                             </td>
                             <td>Fusion debug
                                 {dropdownData && (
-
-
                                     <JsonView src={dropdownData.responseHeader.params} collapsed={true}
                                               className="custom-json-view"/>
 
@@ -288,8 +327,34 @@ const SearchBar = () => {
     )
         ;
 };
-const RecsRequest = ({isRecsPopupOpen, onClose, recsRequest}) => {
+const RecsRequest = ({isRecsPopupOpen, onClose, recsResponse}) => {
+
     if (!isRecsPopupOpen) return null;
+    return (<div className="popup">
+        <div className="popup-inner">
+            <div className="popup-header">
+                <span className="popup-title">Item to items </span>
+                <button className="popup-close-btn" onClick={onClose}>X</button>
+            </div>
+            <div className="popup-content">
+
+                <table>
+                    {
+                        recsResponse && (
+                            recsResponse?.docs?.map((doc, idx) => (
+                                <tr key ={idx}>
+                                    <td>
+                                        doc.productId_l
+                                    </td>
+                                </tr>
+                            ))
+                        )
+                    }
+                </table>
+
+            </div>
+        </div>
+    </div>);
 }
 
 const SearchPopup = ({isSearchPopupOpen, onClose, selectedItemInfo, selectedItemInfoName}) => {
@@ -458,8 +523,9 @@ async function fetchSearchRequest(query, setSearchResults, entryCount, setEntryC
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
     var url = localStorage.getItem('url') || '';
+    var searchProfile = localStorage.getItem('searchProfile') || '';
     const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrl = `https://${url}/api/apps/mouser/query/mouser?q=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/${searchProfile}?q=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds
@@ -500,4 +566,50 @@ async function fetchSearchRequest(query, setSearchResults, entryCount, setEntryC
     }
 }
 
+async function fetchSearchRecsRequest(query, setRecsResponse, entryCount, setEntryCount, setTime, setResponseText,time, setRequestQuery){
+    var login = localStorage.getItem('login') || '';
+    var password = localStorage.getItem('password') || '';
+    var url = localStorage.getItem('url') || '';
+    var recsProfile = localStorage.getItem('recsProfile') || '';
+    const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
+    const targetUrl = `https://${url}/api/apps/mouser/query/${recsProfile}?productId=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
+    const encodedCredentials = btoa(`${login}:${password}`);
+    const currentTime = new Date();
+    const startTime = Date.now(); // Start time in milliseconds
+    try {
+        const response = await fetch(proxyUrl + targetUrl, {
+            method: 'GET',
+            cache: 'no-cache',
+            headers: {
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Pragma': 'no-cache',
+                'Cache-Control': 'max-age=0',
+                'Authorization': `Basic ${encodedCredentials}`,
+                'Content-type': '*/*',
+            }
+        });
+        if (entryCount > 1_000_000_000) {
+            await setEntryCount(0);
+        }
+        // eslint-disable-next-line no-useless-concat
+        setRequestQuery(prev => "recs: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n \n" + `${prev}`);
+        // setRequestQuery(prev => "search: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n" + `${prev}`);
+        if (!response.ok) {
+            const errorText = await response.text(); // Get the response text even if the response is not ok
+            setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
+            setEntryCount(entryCount + 1);
+            return;
+        }
+
+
+        const data = await response.json();
+        setRecsResponse(data);
+    } catch (error) {
+        console.error('Fetch error:', error);
+    } finally {
+        const endTime = Date.now();
+        const duration = endTime - startTime; // Duration in milliseconds
+        setTime(`${duration} ms`);
+    }
+}
 export default SearchBar;
