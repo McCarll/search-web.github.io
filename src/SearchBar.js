@@ -306,6 +306,7 @@ const SearchBar = () => {
                                     isRecsPopupOpen={isRecsPopupOpen}
                                     onClose={() => setIsRecsPopupOpen(false)}
                                     recsResponse={recsResponse}
+
                                 />
 
                             </td>
@@ -327,35 +328,51 @@ const SearchBar = () => {
     )
         ;
 };
-const RecsRequest = ({isRecsPopupOpen, onClose, recsResponse}) => {
+const RecsRequest = ({ isRecsPopupOpen, onClose, recsResponse }) => {
+
+
+    useEffect(() => {
+
+    }, []);
 
     if (!isRecsPopupOpen) return null;
-    return (<div className="popup">
-        <div className="popup-inner">
-            <div className="popup-header">
-                <span className="popup-title">Item to items </span>
-                <button className="popup-close-btn" onClick={onClose}>X</button>
-            </div>
-            <div className="popup-content">
 
-                <table>
-                    {
-                        recsResponse && (
-                            recsResponse?.docs?.map((doc, idx) => (
-                                <tr key ={idx}>
-                                    <td>
-                                        doc.productId_l
-                                    </td>
+    return (
+        <div className="popup">
+            <div className="popup-inner">
+                <div className="popup-header">
+                    <span className="popup-title">Item to items</span>
+                    <button className="popup-close-btn" onClick={onClose}>X</button>
+                </div>
+                <div className="popup-content">
+                    <p>Total Found: {recsResponse?.response?.numFound}</p>
+                    {recsResponse && recsResponse.response && recsResponse.response.docs.map((doc, idx) => (
+                        <div key={idx}>
+
+                            <h3>Item {idx + 1}</h3>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Parameter Name</th>
+                                    <th>Value</th>
                                 </tr>
-                            ))
-                        )
-                    }
-                </table>
-
+                                </thead>
+                                <tbody>
+                                {Object.entries(doc).map(([paramName, value], subIdx) => (
+                                    <tr key={subIdx}>
+                                        <td>{paramName}</td>
+                                        <td>{value}</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
-    </div>);
-}
+    );
+};
 
 const SearchPopup = ({isSearchPopupOpen, onClose, selectedItemInfo, selectedItemInfoName}) => {
     if (!isSearchPopupOpen) return null;
@@ -593,7 +610,6 @@ async function fetchSearchRecsRequest(query, setRecsResponse, entryCount, setEnt
         }
         // eslint-disable-next-line no-useless-concat
         setRequestQuery(prev => "recs: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n \n" + `${prev}`);
-        // setRequestQuery(prev => "search: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n" + `${prev}`);
         if (!response.ok) {
             const errorText = await response.text(); // Get the response text even if the response is not ok
             setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
