@@ -304,7 +304,7 @@ const SearchBar = () => {
                                 />
                                 <RecsRequest
                                     isRecsPopupOpen={isRecsPopupOpen}
-                                    onClose={() => setIsRecsPopupOpen(false)}
+                                    onClose={() => setIsRecsPopupOpen(false) & setRecsResponse(null)}
                                     recsResponse={recsResponse}
 
                                 />
