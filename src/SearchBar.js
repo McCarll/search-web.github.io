@@ -38,6 +38,8 @@ const SearchBar = () => {
     const [recsProfile, setRecsProfile] = useState(localStorage.getItem('recsProfile'));
     const [requestQuery, setRequestQuery] = useState('');
     const [recsResponse, setRecsResponse] = useState('');
+    const [selectedItemRecs, setSelectedItemRecs] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         setLogin(localStorage.getItem('login'));
@@ -86,16 +88,29 @@ const SearchBar = () => {
         setSearchQuery(value);
         debouncedTypeaheadSearch(value);
     };
-    const getSearchResults = (e) => {
-        const value = {searchQuery};
-        console.log("getSearchResults:: " + value);
-        debouncedSearch(value);
+    // const getSearchResults = (e) => {
+    //     const value = {searchQuery};
+    //     console.log("getSearchResults:: " + value);
+    //     debouncedSearch(value);
+    // };
+
+    const getSearchResults = async () => {
+        setIsLoading(true);
+        // Perform the search. This is a simplified example; you'll need to implement actual search logic.
+        try {
+            await debouncedSearch({searchQuery})
+        } catch (error) {
+            console.error('Search failed:', error);
+            // Handle the error accordingly
+        }
+        setIsLoading(false);
     };
     const getSearchRecsResults = (e) => {
         // const value = {recsRequest};
         console.log("getSearchRecResults:: " + e);
         debouncedRecsSearch(e);
     };
+
 
     return (
         <div>
@@ -228,10 +243,10 @@ const SearchBar = () => {
                         <tbody>
                         <tr>
                             <td><b>Type ahead menu</b>
-                                {dropdownData && (
+                                {dropdownData && title && (
                                     <>
                                         <b className="container-header"> {title}</b>
-                                        {dropdownData.grouped.type.groups.map((group, index) => (
+                                        {dropdownData?.grouped?.type?.groups?.map((group, index) => (
                                             <div key={index} className="group-section">
                                                 <div className="group-header">{group.groupValue}</div>
                                                 <table>
@@ -262,7 +277,10 @@ const SearchBar = () => {
 
                             {/* Second column for search results */}
                             <td><b>Search</b>
-                                {searchResults && (
+                                {isLoading ? (
+                                    <p>Loading...</p>
+                                ) : (
+                                    searchResults && (
                                     <>
                                         <b className="container-header">{time}</b>
                                         <table>
@@ -279,6 +297,7 @@ const SearchBar = () => {
                                                         setRecsRequest(doc.ProductId_l);
                                                         setIsRecsPopupOpen(true);
                                                         getSearchRecsResults(doc.ProductId_l)
+                                                        setSelectedItemRecs(doc)
                                                     }
                                                     }>recs
                                                     </td>
@@ -294,7 +313,7 @@ const SearchBar = () => {
                                             </tbody>
                                         </table>
                                     </>
-                                )}
+                                ))}
 
                                 <SearchPopup
                                     isSearchPopupOpen={isSearchPopupOpen}
@@ -304,8 +323,9 @@ const SearchBar = () => {
                                 />
                                 <RecsRequest
                                     isRecsPopupOpen={isRecsPopupOpen}
-                                    onClose={() => setIsRecsPopupOpen(false) & setRecsResponse(null)}
+                                    onClose={() => setIsRecsPopupOpen(false) & setRecsResponse(null) & setSelectedItemRecs(null)}
                                     recsResponse={recsResponse}
+                                    sourceItem={selectedItemRecs}
 
                                 />
 
@@ -328,51 +348,66 @@ const SearchBar = () => {
     )
         ;
 };
-const RecsRequest = ({ isRecsPopupOpen, onClose, recsResponse }) => {
-
-
-    useEffect(() => {
-
-    }, []);
-
+const RecsRequest = ({ isRecsPopupOpen, onClose, recsResponse, sourceItem }) => {
     if (!isRecsPopupOpen) return null;
+
+    const renderTable = (item) => (
+        <table key={new Date()}>
+            <thead>
+            <tr>
+                <th>Parameter Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            {Object.entries(item).map(([paramName, value], idx) => (
+                <tr key={idx}>
+                    <td title={paramName}>{paramName}</td>
+                    <td title={value}>{value}</td>
+                </tr>
+            ))}
+            </tbody>
+        </table>
+    );
 
     return (
         <div className="popup">
-            <div className="popup-inner">
+        <div className="popup-inner">
                 <div className="popup-header">
                     <span className="popup-title">Item to items</span>
                     <button className="popup-close-btn" onClick={onClose}>X</button>
                 </div>
                 <div className="popup-content">
                     <p>Total Found: {recsResponse?.response?.numFound}</p>
-                    {recsResponse && recsResponse.response && recsResponse.response.docs.map((doc, idx) => (
-                        <div key={idx}>
-
-                            <h3>Item {idx + 1}</h3>
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Parameter Name</th>
-                                    <th>Value</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {Object.entries(doc).map(([paramName, value], subIdx) => (
-                                    <tr key={subIdx}>
-                                        <td>{paramName}</td>
-                                        <td>{value}</td>
-                                    </tr>
+                    <div className="comparison-container">
+                        <table className="table table-responsive">
+                            <tbody>
+                            <td>
+                                <div className="source-item">
+                                    <h3>Source Item</h3>
+                                    {renderTable(sourceItem)}
+                                </div>
+                            </td>
+                            <td>
+                                {recsResponse && recsResponse.response && recsResponse.response.docs.map((doc, idx) => (
+                                    <div key={idx} className="recs-item">
+                                        <h3>Item {idx + 1}</h3>
+                                        {renderTable(doc)}
+                                    </div>
                                 ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ))}
+                            </td>
+                            </tbody>
+
+                        </table>
+
+
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
+
 
 const SearchPopup = ({isSearchPopupOpen, onClose, selectedItemInfo, selectedItemInfoName}) => {
     if (!isSearchPopupOpen) return null;
