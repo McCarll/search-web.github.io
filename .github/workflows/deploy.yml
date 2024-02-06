@@ -41,7 +41,7 @@ jobs:
       - name: Build project
         env:
           REACT_APP_MY_NEW_CUSTOM_SECRET_ENV_NAME: ${{ secrets.REACT_APP_MY_NEW_CUSTOM_SECRET_ENV_NAME }}
-        run: ${{ steps.detect-package-manager.outputs.runner }} npm run build
+        run: ${{ steps.detect-package-manager.outputs.runner }} npm run start
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
