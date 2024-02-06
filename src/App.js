@@ -3,14 +3,23 @@ import './App.css';
 import SearchBar from "./SearchBar";
 import AuthProvider from "./Auth";
 import Auth from "./Auth";
+import {useState} from "react";
+import PasswordPage from "./PasswordPage";
 
 function App() {
+    const [accessGranted, setAccessGranted] = useState(false);
+
+    const handlePasswordSuccess = () => {
+        setAccessGranted(true);
+    };
+
     return (
         <div className="App">
-            {/*<AuthProvider>*/}
-                {/*<Auth/>*/}
+            {accessGranted ? (
                 <SearchBar/>
-            {/*</AuthProvider>*/}
+            ) : (
+                <PasswordPage onPasswordSuccess={handlePasswordSuccess} />
+            )}
         </div>
     );
 }

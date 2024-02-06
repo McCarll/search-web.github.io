@@ -4,12 +4,8 @@ import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 import './TreeView.css';
-import {ForceGraph2D} from 'react-force-graph';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-import {AuthContext} from "./AuthProvider";
 import Tree from "react-d3-tree"; // Default styles, dark mode available with 'dark.css'
 
-// import { AuthContext } from './AuthProvider';
 
 
 const SearchBar = () => {
