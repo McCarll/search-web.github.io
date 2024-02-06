@@ -28,6 +28,11 @@ jobs:
         with:
           node-version: "18"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
+      - name: Create env file
+        run: |
+          touch .env
+          echo REACT_APP_MY_NEW_CUSTOM_SECRET_ENV_NAME=${{ secrets.REACT_APP_MY_NEW_CUSTOM_SECRET_ENV_NAME}} >> .env
+          cat .env
       - name: Install dependencies
         run: npm install
       - name: Build project
