@@ -1,21 +1,18 @@
+name: Create envfile
+
+on: [ push ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v1
         with:
-          node-version: '14'
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
       - name: Build
-        run: npm run build
-      - name: Deploy
         env:
-          MY_SECRET: ${{ secrets.MY_NEW_CUSTOM_SECRET_ENV_NAME }}
-        run: |
-          # Use the environment variable in your deployment script or pass it to your application
-          echo "Using secret in deployment script"
-          # Example: Passing secret to an application command
-          npm run deploy --secret=$MY_SECRET
+          REACT_APP_MY_NEW_CUSTOM_SECRET_ENV_NAME: ${{ secrets.MY_NEW_CUSTOM_SECRET_ENV_NAME }}
+        run: npm run build

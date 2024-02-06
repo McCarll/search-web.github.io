@@ -8,6 +8,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.2",
+    "crypto-browserify": "^3.12.0",
     "d3": "^7.8.5",
     "gh-pages": "^6.1.1",
     "react": "^18.2.0",
@@ -16,7 +17,8 @@
     "react-force-graph": "^1.44.1",
     "react-scripts": "5.0.1",
     "react18-json-view": "latest",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "webpack": "^5.90.1"
   },
   "scripts": {
     "predeploy": "npm run build",
@@ -27,6 +29,7 @@
     "eject": "react-scripts eject",
     "gh": "npm i gh-pages",
     "d3": "npm install react-d3-tree",
+    "crypto": "npm install dotenv dotenv-webpack --save-dev",
     "bootstrap": "npm install bootstrap@5 --save"
   },
   "eslintConfig": {
@@ -46,5 +49,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.1",
+    "dotenv-webpack": "^8.0.1"
   }
 }

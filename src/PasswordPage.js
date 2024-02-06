@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-
 function PasswordPage({ onPasswordSuccess }) {
     const [password, setPassword] = useState('');
-    const correctPassword = process.env.MY_SECRET;
 
     const handleSubmit = (event) => {
-        console.log("coorect pass :: "+ correctPassword);
         event.preventDefault();
-        if (password === correctPassword) {
+        if (password === process.env.REACT_APP_MY_NEW_CUSTOM_SECRET_ENV_NAME) {
             onPasswordSuccess();
         } else {
             alert('Incorrect Password');
