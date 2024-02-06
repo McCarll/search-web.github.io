@@ -27,7 +27,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "gh": "npm i gh-pages",
+    "update-dependecy": "npm update",
     "d3": "npm install react-d3-tree",
     "crypto": "npm install dotenv dotenv-webpack --save-dev",
     "bootstrap": "npm install bootstrap@5 --save"
