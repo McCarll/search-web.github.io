@@ -29,7 +29,6 @@
     "eject": "react-scripts eject",
     "update-dependecy": "npm update",
     "d3": "npm install react-d3-tree",
-    "crypto": "npm install dotenv dotenv-webpack --save-dev",
     "bootstrap": "npm install bootstrap@5 --save"
   },
   "eslintConfig": {
@@ -49,9 +48,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "dotenv": "^16.4.1",
-    "dotenv-webpack": "^8.0.1"
   }
 }
