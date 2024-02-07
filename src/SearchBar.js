@@ -18,11 +18,10 @@ const SearchBar = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
     const [selectedItemDebugInfo, setSelectedItemDebugInfo] = useState(null);
-    const [selectedItemName, setSelectedItemName] = useState(null);
+    // const [selectedItemName, setSelectedItemName] = useState(null);
     const [searchResults, setSearchResults] = useState(null);
     const [selectedItemInfo, setSelectedItemInfo] = useState(null);
     const [selectedItemInfoName, setSelectedItemInfoName] = useState(null);
-    const [recsRequest, setRecsRequest] = useState(null);
     const [isRecsPopupOpen, setIsRecsPopupOpen] = useState(false);
     // Initialize state with values from localStorage or default to empty strings
     const [login, setLogin] = useState(localStorage.getItem('login'));
@@ -250,7 +249,7 @@ const SearchBar = () => {
                                                         <tr key={idx}>
                                                             <td onClick={() => {
                                                                 setSelectedItemDebugInfo(dropdownData.debug.explain[doc.id]);
-                                                                setSelectedItemName(doc.display_name);
+                                                                // setSelectedItemName(doc.display_name);
                                                                 setIsPopupOpen(true);
                                                             }}>{doc.display_name}</td>
                                                             <td width={150}>{doc.score}</td>
@@ -266,7 +265,6 @@ const SearchBar = () => {
                                     isOpen={isPopupOpen}
                                     onClose={() => setIsPopupOpen(false)}
                                     selectedItemDebugInfo={selectedItemDebugInfo}
-                                    selectedItemName={selectedItemName}
                                 />
                             </td>
 
@@ -289,7 +287,6 @@ const SearchBar = () => {
                                                     }}>{doc.ProductClassName_s}</td>
                                                     <td>{doc.score}</td>
                                                     <td onClick={() => {
-                                                        setRecsRequest(doc.ProductId_l);
                                                         setIsRecsPopupOpen(true);
                                                         getSearchRecsResults(doc.ProductId_l)
                                                         setSelectedItemRecs(doc)
@@ -298,7 +295,7 @@ const SearchBar = () => {
                                                     </td>
                                                     <td onClick={() => {
                                                         setSelectedItemDebugInfo(searchResults.debug.explain[doc.ProductId_l]);
-                                                        setSelectedItemName(doc.display_name);
+                                                        // setSelectedItemName(doc.display_name);
                                                         setIsPopupOpen(true);
                                                     }
                                                     }>debug
@@ -458,7 +455,7 @@ function wrap(line) {
     return lines;
 }
 
-const Popup = ({isOpen, onClose, selectedItemDebugInfo, selectedItemName}) => {
+const Popup = ({isOpen, onClose, selectedItemDebugInfo}) => {
     const [treeData, setTreeData] = useState([]);
 
     useEffect(() => {
