@@ -2,7 +2,6 @@ import './App.css';
 import SearchBar from "./SearchBar";
 import {useState} from "react";
 import PasswordPage from "./PasswordPage";
-// require('dotenv').config();
 
 function App() {
     const [accessGranted, setAccessGranted] = useState(false);

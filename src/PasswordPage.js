@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 function PasswordPage({ onPasswordSuccess }) {
-    const [password, setPassword] = useState('');
+    const [password, setPassword] = useState(localStorage.getItem('startup-password'));
+    useEffect(() => {
+        localStorage.setItem('startup-password', password);
+    })
+    useEffect(() => {
+        setPassword(localStorage.getItem('startup-password'));
+    })
 
     const handleSubmit = (event) => {
         event.preventDefault();

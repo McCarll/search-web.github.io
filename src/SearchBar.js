@@ -18,12 +18,10 @@ const SearchBar = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
     const [selectedItemDebugInfo, setSelectedItemDebugInfo] = useState(null);
-    // const [selectedItemName, setSelectedItemName] = useState(null);
     const [searchResults, setSearchResults] = useState(null);
     const [selectedItemInfo, setSelectedItemInfo] = useState(null);
     const [selectedItemInfoName, setSelectedItemInfoName] = useState(null);
     const [isRecsPopupOpen, setIsRecsPopupOpen] = useState(false);
-    // Initialize state with values from localStorage or default to empty strings
     const [login, setLogin] = useState(localStorage.getItem('login'));
     const [password, setPassword] = useState(localStorage.getItem('password'));
     const [url, setUrl] = useState(localStorage.getItem('url'));
@@ -295,7 +293,6 @@ const SearchBar = () => {
                                                     </td>
                                                     <td onClick={() => {
                                                         setSelectedItemDebugInfo(searchResults.debug.explain[doc.ProductId_l]);
-                                                        // setSelectedItemName(doc.display_name);
                                                         setIsPopupOpen(true);
                                                     }
                                                     }>debug
