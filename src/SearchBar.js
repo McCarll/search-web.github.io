@@ -1,6 +1,6 @@
 import './SearchBar.css';
 import debounce from 'lodash.debounce';
-import {useCallback, useContext, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect,  useState} from "react";
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 import './TreeView.css';
@@ -24,7 +24,6 @@ const SearchBar = () => {
     const [selectedItemInfoName, setSelectedItemInfoName] = useState(null);
     const [recsRequest, setRecsRequest] = useState(null);
     const [isRecsPopupOpen, setIsRecsPopupOpen] = useState(false);
-// eslint-disable-next-line react-hooks/rules-of-hooks
     // Initialize state with values from localStorage or default to empty strings
     const [login, setLogin] = useState(localStorage.getItem('login'));
     const [password, setPassword] = useState(localStorage.getItem('password'));

@@ -1,8 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
 import SearchBar from "./SearchBar";
-import AuthProvider from "./Auth";
-import Auth from "./Auth";
 import {useState} from "react";
 import PasswordPage from "./PasswordPage";
 // require('dotenv').config();
