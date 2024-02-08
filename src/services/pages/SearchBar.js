@@ -1,9 +1,9 @@
-import './SearchBar.css';
+import '../../assets/styles/SearchBar.css';
 import debounce from 'lodash.debounce';
 import {useCallback, useEffect,  useState} from "react";
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
-import './TreeView.css';
+import '../../assets/styles/TreeView.css';
 import Tree from "react-d3-tree"; // Default styles, dark mode available with 'dark.css'
 
 

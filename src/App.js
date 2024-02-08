@@ -1,7 +1,7 @@
-import './App.css';
-import SearchBar from "./SearchBar";
+import './assets/styles/App.css';
+import SearchBar from "./services/pages/SearchBar";
 import {useState} from "react";
-import PasswordPage from "./PasswordPage";
+import PasswordPage from "./services/pages/PasswordPage";
 
 function App() {
     const [accessGranted, setAccessGranted] = useState(false);
