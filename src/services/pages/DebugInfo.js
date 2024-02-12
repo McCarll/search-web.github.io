@@ -2,14 +2,6 @@ import React from 'react';
 import '../../assets/styles/SearchBar.css';
 
 const DebugInfo = ({ responseText, requestQuery }) => {
-    // Function to format JSON data nicely for <pre> display
-    const formatJson = (json) => {
-        try {
-            return JSON.stringify(json, null, 2); // spacing level = 2
-        } catch (error) {
-            return `Error formatting JSON: ${error.message}`;
-        }
-    };
 
     return (
         <table>

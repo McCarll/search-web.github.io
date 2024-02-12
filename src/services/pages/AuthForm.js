@@ -1,12 +1,7 @@
 import React from 'react';
 import '../../assets/styles/SearchBar.css';
 
-const AuthForm = ({ auth, setAuth }) => {
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setAuth(prev => ({ ...prev, [name]: value }));
-    };
-
+const AuthForm = ({ auth }) => {
     return (
         <table className="auth-table">
             <tbody>

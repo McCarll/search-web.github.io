@@ -1,10 +1,3 @@
-const buildAuthHeader = (auth) => {
-    const { login, password } = auth;
-    const encodedCredentials = btoa(`${login}:${password}`);
-    return `Basic ${encodedCredentials}`;
-};
-
-
 export const fetchSearchRequest = async (query, setSearchResults, entryCount, setEntryCount, setTime, setResponseText,time, setRequestQuery)  => {
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
@@ -58,7 +51,7 @@ export const  fetchSearchRecsRequest = async (query, setRecsResponse, entryCount
     var url = localStorage.getItem('url') || '';
     var recsProfile = localStorage.getItem('recsProfile') || '';
     const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrl = `https://${url}/api/apps/mouser/query/${recsProfile}?productId=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/${recsProfile}?productid=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds

@@ -4,7 +4,6 @@ import {useCallback, useEffect,  useState} from "react";
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 import '../../assets/styles/TreeView.css';
-import Tree from "react-d3-tree";
 import AuthForm from "./AuthForm";
 import DebugInfo from "./DebugInfo";
 import SearchPopup from "./SearchPopup";
@@ -79,7 +78,7 @@ const SearchBar = () => {
         debouncedRecsSearch(e);
     };
 // Authentication state
-    const [auth, setAuth] = useState({
+    const [auth] = useState({
         login: localStorage.getItem('login'),
         password: localStorage.getItem('password'),
         url: localStorage.getItem('url'),
@@ -101,7 +100,7 @@ const SearchBar = () => {
     return (
         <div>
             <div className="top_div">
-                <AuthForm auth={auth} setAuth={setAuth}></AuthForm>
+                <AuthForm auth={auth} ></AuthForm>
                 <DebugInfo responseText={responseText} requestQuery={requestQuery}></DebugInfo>
             </div>
             <div class="container">
