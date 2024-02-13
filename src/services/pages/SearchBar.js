@@ -13,13 +13,22 @@ import {fetchSearchRecsRequest, fetchSearchRequest, fetchTypeAheadRequest} from 
 
 
 
+
 const SearchBar = () => {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [responseText, setResponseText] = useState('');
+
+
+    const [recsResponse, setRecsResponse] = useState('');
     const [entryCount, setEntryCount] = useState(0);
+    const [time, setTime] = useState('Search time');
+    const [responseText, setResponseText] = useState('');
+    const [requestQuery, setRequestQuery] = useState('');
+    const [searchRecsType, setSearchRecsType] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [recsQuery, setRecsQuery] = useState('');
+
+    const [searchQuery, setSearchQuery] = useState('');
     const [dropdownData, setDropdownData] = useState(null);
     const [title, setTitle] = useState('Type ahead menu');
-    const [time, setTime] = useState('Search time');
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
     const [selectedItemDebugInfo, setSelectedItemDebugInfo] = useState(null);
@@ -27,13 +36,10 @@ const SearchBar = () => {
     const [selectedItemInfo, setSelectedItemInfo] = useState(null);
     const [selectedItemInfoName, setSelectedItemInfoName] = useState(null);
     const [isRecsPopupOpen, setIsRecsPopupOpen] = useState(false);
-    const [requestQuery, setRequestQuery] = useState('');
-    const [recsResponse, setRecsResponse] = useState('');
     const [selectedItemRecs, setSelectedItemRecs] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
 
-        const debouncedTypeaheadSearch = useCallback(
+    const debouncedTypeaheadSearch = useCallback(
         debounce(async (query) => {
             if (query.length > 2) { // Only search if the user has typed more than 2 characters
                 await fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, query, setTitle, setRequestQuery);
@@ -49,12 +55,21 @@ const SearchBar = () => {
         }, 300),
         [] // Dependency array, empty means the debounce function won't change
     );
-    const debouncedRecsSearch = useCallback(
-        debounce(async (query) => {
-            await fetchSearchRecsRequest(query, setRecsResponse, entryCount, setEntryCount, setTime, setResponseText, time, setRequestQuery);
-        }, 300),
-        [] // Dependency array, empty means the debounce function won't change
-    );
+
+    const debouncedFetchSearchRecs = useCallback(debounce((query, searchRecsType) => {
+        fetchSearchRecs(query, searchRecsType);
+    }, 300), []);
+
+    useEffect(() => {
+        if (recsQuery) {
+            debouncedFetchSearchRecs(recsQuery, searchRecsType);
+        }
+    }, [recsQuery, debouncedFetchSearchRecs]);
+    const fetchSearchRecs = async (query, searchRecsType) => {
+        setIsLoading(true);
+        await fetchSearchRecsRequest(query, setRecsResponse, entryCount, setEntryCount, setTime, setResponseText, time, setRequestQuery, searchRecsType);
+        setIsLoading(false);
+    };
 
     const handleSearch = (e) => {
         const value = e.target.value;
@@ -64,19 +79,14 @@ const SearchBar = () => {
 
     const getSearchResults = async () => {
         setIsLoading(true);
-        // Perform the search. This is a simplified example; you'll need to implement actual search logic.
         try {
             await debouncedSearch({searchQuery})
         } catch (error) {
             console.error('Search failed:', error);
-            // Handle the error accordingly
         }
         setIsLoading(false);
     };
-    const getSearchRecsResults = (e) => {
-        console.log("getSearchRecResults:: " + e);
-        debouncedRecsSearch(e);
-    };
+
 // Authentication state
     const [auth] = useState({
         login: localStorage.getItem('login'),
@@ -172,7 +182,10 @@ const SearchBar = () => {
                                                     <td>{doc.score}</td>
                                                     <td onClick={() => {
                                                         setIsRecsPopupOpen(true);
-                                                        getSearchRecsResults(doc.ProductId_l)
+                                                        setSearchRecsType('productid')
+                                                        setRecsQuery(doc.ProductId_l)
+                                                        // getSearchRecsResults(doc.ProductId_l)
+                                                        // getSearchRecsResults()
                                                         setSelectedItemRecs(doc)
                                                     }
                                                     }>recs
@@ -201,6 +214,11 @@ const SearchBar = () => {
                                     onClose={() => setIsRecsPopupOpen(false) & setRecsResponse(null) & setSelectedItemRecs(null)}
                                     recsResponse={recsResponse}
                                     sourceItem={selectedItemRecs}
+                                    searchRecsType={searchRecsType}
+                                    setSearchRecsType = {setSearchRecsType}
+                                    isLoading={isLoading}
+                                    setRecsQuery={setRecsQuery}
+                                    recsQuery={recsQuery}
 
                                 />
 

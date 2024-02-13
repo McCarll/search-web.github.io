@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
 import '../../assets/styles/SearchBar.css';
 
 const SearchResults = ({ searchResults, recsResponse, isLoading }) => {
     // Function to render search results
+
     const renderSearchResults = () => {
         if (isLoading) {
             return <p>Loading search results...</p>;

@@ -45,13 +45,14 @@ export const fetchSearchRequest = async (query, setSearchResults, entryCount, se
     }
 }
 
-export const  fetchSearchRecsRequest = async (query, setRecsResponse, entryCount, setEntryCount, setTime, setResponseText,time, setRequestQuery) => {
-    var login = localStorage.getItem('login') || '';
-    var password = localStorage.getItem('password') || '';
-    var url = localStorage.getItem('url') || '';
-    var recsProfile = localStorage.getItem('recsProfile') || '';
+export const  fetchSearchRecsRequest = async (query, setRecsResponse, entryCount, setEntryCount, setTime, setResponseText,time, setRequestQuery, searchType) => {
+    const login = localStorage.getItem('login') || '';
+    const password = localStorage.getItem('password') || '';
+    const url = localStorage.getItem('url') || '';
+    const recsProfile = localStorage.getItem('recsProfile') || '';
     const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrl = `https://${url}/api/apps/mouser/query/${recsProfile}?productid=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
+    const targetUrlLog = `https://${url}/api/apps/mouser/query/${recsProfile}?${searchType}=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/${recsProfile}?${searchType}=${encodeURIComponent(query)}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
     const currentTime = new Date();
     const startTime = Date.now(); // Start time in milliseconds
@@ -71,7 +72,7 @@ export const  fetchSearchRecsRequest = async (query, setRecsResponse, entryCount
             await setEntryCount(0);
         }
         // eslint-disable-next-line no-useless-concat
-        setRequestQuery(prev => "recs: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n \n" + `${prev}`);
+        setRequestQuery(prev => "recs: " + targetUrlLog.replace(/&nocache=\d+$/, '') + " \n \n" + `${prev}`);
         if (!response.ok) {
             const errorText = await response.text(); // Get the response text even if the response is not ok
             setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
