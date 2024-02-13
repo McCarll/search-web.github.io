@@ -217,6 +217,7 @@ const SearchBar = () => {
                                     setSearchRecsType = {setSearchRecsType}
                                     isLoading={isLoading}
                                     setRecsQuery={setRecsQuery}
+                                    time={time}
 
                                 />
 

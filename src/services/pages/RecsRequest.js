@@ -7,7 +7,8 @@ const RecsRequest = ({
                          sourceItem,
                          setSearchRecsType,
                          isLoading,
-                         setRecsQuery
+                         setRecsQuery,
+                         time
                      }) => {
     const [position, setPosition] = useState({ x: 100, y: 100 });
 
@@ -119,7 +120,7 @@ const RecsRequest = ({
                     <button className="popup-close-btn" onClick={onClose}>X</button>
                 </div>
                 <div className="popup-content">
-                    <p>Total Found: {recsResponse?.response?.numFound}</p>
+                    <p>Total Found: {recsResponse?.response?.numFound} in {time}</p>
                     <div className="comparison-container">
                         <table className="table table-responsive">
                             <tbody>
