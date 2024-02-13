@@ -5,11 +5,9 @@ const RecsRequest = ({
                          onClose,
                          recsResponse,
                          sourceItem,
-                         searchRecsType,
                          setSearchRecsType,
                          isLoading,
-                         setRecsQuery,
-                         recsQuery
+                         setRecsQuery
                      }) => {
     const [position, setPosition] = useState({ x: 100, y: 100 });
 

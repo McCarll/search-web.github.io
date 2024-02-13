@@ -214,11 +214,9 @@ const SearchBar = () => {
                                     onClose={() => setIsRecsPopupOpen(false) & setRecsResponse(null) & setSelectedItemRecs(null)}
                                     recsResponse={recsResponse}
                                     sourceItem={selectedItemRecs}
-                                    searchRecsType={searchRecsType}
                                     setSearchRecsType = {setSearchRecsType}
                                     isLoading={isLoading}
                                     setRecsQuery={setRecsQuery}
-                                    recsQuery={recsQuery}
 
                                 />
 
