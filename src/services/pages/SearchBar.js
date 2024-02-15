@@ -122,12 +122,24 @@ const SearchBar = () => {
             [field]: value,
         }));
     };
+    const [isDivVisible, setIsDivVisible] = useState(true);
+
+    const toggleDivVisibility = () => {
+        setIsDivVisible(!isDivVisible);
+    };
     return (
         <div>
-            <div className="top_div">
-                <AuthForm auth={auth} setAuthField={updateAuthField} ></AuthForm>
-                <DebugInfo requests={requests}></DebugInfo>
-            </div>
+            <>
+                <button onClick={toggleDivVisibility}>
+                    {isDivVisible ? 'Hide' : 'Show'}
+                </button>
+                {isDivVisible && (
+                    <div className="top_div">
+                        <AuthForm auth={auth} setAuthField={updateAuthField} />
+                        <DebugInfo requests={requests} />
+                    </div>
+                )}
+            </>
             <div class="container">
                 <div className="search-container">
                     <input
