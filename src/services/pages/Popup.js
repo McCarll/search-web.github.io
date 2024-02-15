@@ -6,7 +6,6 @@ const Popup = ({isOpen, onClose, selectedItemDebugInfo}) => {
 
     useEffect(() => {
         const buildTree = (data) => {
-            console.log("Processing data:", data);
             if (!data) return null; // Check if data is undefined or null
             const lines = wrap(data?.description?.toString() || '');
             const attributes = {};

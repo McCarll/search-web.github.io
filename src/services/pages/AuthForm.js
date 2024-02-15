@@ -16,7 +16,6 @@ const AuthForm = ({ auth, setAuthField }) => {
                         type="text"
                         value={auth.login}
                         onChange={(e) => setAuthField('login', e.target.value)}
-                        // onChange={(e) => auth.setLogin(e.target.value)}
                         placeholder="login"
                     />
                 </td>

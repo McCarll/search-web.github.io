@@ -1,145 +1,225 @@
-export const fetchSearchRequest = async (query, setSearchResults, entryCount, setEntryCount, setTime, setResponseText,time, setRequestQuery,setFusionDebugData)  => {
-    var login = localStorage.getItem('login') || '';
-    var password = localStorage.getItem('password') || '';
-    var url = localStorage.getItem('url') || '';
-    var searchProfile = localStorage.getItem('searchProfile') || '';
-    const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrl = `https://${url}/api/apps/mouser/query/${searchProfile}?q=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
+export const fetchSearchRequest = async (
+    query,
+    setSearchResults,
+    entryCount,
+    setEntryCount,
+    setTime,
+    time,
+    setFusionDebugData,
+    updateRequest // Assuming this now handles both adding and updating requests
+) => {
+    const login = localStorage.getItem('login') || '';
+    const password = localStorage.getItem('password') || '';
+    const url = localStorage.getItem('url') || '';
+    const searchProfile = localStorage.getItem('searchProfile') || '';
+    const proxyUrl = 'https://corsproxy.io/?'; // Adjust with your actual proxy URL
+    const targetUrl = `https://${url}/api/apps/mouser/query/${searchProfile}?q=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${Math.random()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
-    const currentTime = new Date();
-    const startTime = Date.now(); // Start time in milliseconds
+    const uniqueRequestId = Date.now(); // Unique ID for the request
+
+    // Add initial request entry with "loading..." placeholders
+    updateRequest(uniqueRequestId, {
+        queryType: "search",
+        url: targetUrl.replace(/&debug=.*$/, ''),
+        responseCode: "loading...",
+        responseTime: "loading..."
+    });
+
+    const startTime = Date.now();
+    let response;
     try {
-        const response = await fetch(proxyUrl + targetUrl, {
+        response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
             method: 'GET',
-            cache: 'no-cache',
             headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                'Pragma': 'no-cache',
-                'Cache-Control': 'max-age=0',
                 'Authorization': `Basic ${encodedCredentials}`,
-                'Content-type': '*/*',
+                // Include other necessary headers
             }
         });
-        if (entryCount > 1_000_000_000) {
-            await setEntryCount(0);
-        }
-        // eslint-disable-next-line no-useless-concat
-        setRequestQuery(prev => "search: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n \n" + `${prev}`);
-        // setRequestQuery(prev => "search: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n" + `${prev}`);
-        if (!response.ok) {
-            const errorText = await response.text(); // Get the response text even if the response is not ok
-            setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
-            setEntryCount(entryCount + 1);
-            return;
-        }
 
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const data = await response.json();
         setSearchResults(data);
         setFusionDebugData(data.responseHeader);
+        setTime(`${duration} ms`);
+
+        // Update the request in state with actual response data
+        updateRequest(uniqueRequestId, {
+            queryType: "search",
+            url: targetUrl.replace(/&debug=.*$/, ''),
+            responseCode: response.status,
+            responseTime: `${duration} ms`
+        });
     } catch (error) {
         console.error('Fetch error:', error);
+        // Update the request in state to indicate an error
+        updateRequest(uniqueRequestId, {
+            queryType: "search",
+            url: targetUrl.replace(/&debug=.*$/, ''),
+            responseCode: response.status,
+            responseTime: `${ Date.now()- startTime}`
+        });
     } finally {
-        const endTime = Date.now();
-        const duration = endTime - startTime; // Duration in milliseconds
-        setTime(`${duration} ms`);
+        if (entryCount >= 1_000_000_000) {
+            await setEntryCount(0); // Reset entry count if it's too high
+        }
+        setEntryCount((prevCount) => prevCount + 1);
     }
-}
+};
 
-export const  fetchSearchRecsRequest = async (query, setRecsResponse, entryCount, setEntryCount, setTime, setResponseText,time, setRequestQuery, searchType) => {
+
+export const fetchSearchRecsRequest = async (
+    query,
+    setRecsResponse,
+    entryCount,
+    setEntryCount,
+    setTime,
+    time,
+    searchType,
+    updateRequest // Use this function to update request entries
+) => {
     const login = localStorage.getItem('login') || '';
     const password = localStorage.getItem('password') || '';
     const url = localStorage.getItem('url') || '';
     const recsProfile = localStorage.getItem('recsProfile') || '';
-    const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
-    const targetUrlLog = `https://${url}/api/apps/mouser/query/${recsProfile}?${searchType}=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
-    const targetUrl = `https://${url}/api/apps/mouser/query/${recsProfile}?${searchType}=${encodeURIComponent(query)}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
+    const proxyUrl = 'https://corsproxy.io/?'; // Adjust with your actual proxy URL
+    const targetUrlLog = `https://${url}/api/apps/mouser/query/${recsProfile}?${searchType}=${query}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${Math.random()}`;
+    const targetUrl = `https://${url}/api/apps/mouser/query/${recsProfile}?${searchType}=${encodeURIComponent(query)}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${Math.random()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
-    const currentTime = new Date();
-    const startTime = Date.now(); // Start time in milliseconds
+    const uniqueRequestId = Date.now(); // Unique ID for the request
+
+    // Add initial request entry with "loading..." placeholders
+    updateRequest(uniqueRequestId, {
+        queryType: "recommendations",
+        url: targetUrlLog,
+        responseCode: "loading...",
+        responseTime: "loading..."
+    });
+
+    const startTime = Date.now();
+    let response;
     try {
-        const response = await fetch(proxyUrl + targetUrl, {
+        response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
             method: 'GET',
-            cache: 'no-cache',
             headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                'Pragma': 'no-cache',
-                'Cache-Control': 'max-age=0',
                 'Authorization': `Basic ${encodedCredentials}`,
-                'Content-type': '*/*',
+                // Include other necessary headers
             }
         });
-        if (entryCount > 1_000_000_000) {
-            await setEntryCount(0);
-        }
-        // eslint-disable-next-line no-useless-concat
-        setRequestQuery(prev => "recs: " + targetUrlLog.replace(/&nocache=\d+$/, '') + " \n \n" + `${prev}`);
-        if (!response.ok) {
-            const errorText = await response.text(); // Get the response text even if the response is not ok
-            setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
-            setEntryCount(entryCount + 1);
-            return;
-        }
 
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const data = await response.json();
         setRecsResponse(data);
+        setTime(`${duration} ms`);
+
+        // Update the request in state with actual response data
+        updateRequest(uniqueRequestId, {
+            queryType: "recommendations",
+            url: targetUrl.replace(/&debug=.*$/, ''),
+            responseCode: response.status,
+            responseTime: `${duration} ms`
+        });
     } catch (error) {
         console.error('Fetch error:', error);
+        // Update the request in state to indicate an error
+        updateRequest(uniqueRequestId, {
+            queryType: "recommendations",
+            url: targetUrl.replace(/&debug=.*$/, ''),
+            responseCode: response.status,
+            responseTime: `${ Date.now()- startTime}`
+        });
     } finally {
-        const endTime = Date.now();
-        const duration = endTime - startTime; // Duration in milliseconds
-        setTime(`${duration} ms`);
+        if (entryCount >= 1_000_000_000) {
+            await setEntryCount(0); // Reset entry count if it's too high
+        }
+        setEntryCount((prevCount) => prevCount + 1);
     }
-}
+};
 
-export const fetchTypeAheadRequest = async (setDropdownData, setResponseText, entryCount, setEntryCount, searchQuery, setTitle, setRequestQuery,setFusionDebugData) => {
 
-    var login = localStorage.getItem('login') || '';
-    var password = localStorage.getItem('password') || '';
-    var url = localStorage.getItem('url') || '';
-    var pipeline = localStorage.getItem('pipeline') || '';
-    const proxyUrl = 'https://corsproxy.io/?'; // Replace with your actual proxy URL
+
+export const fetchTypeAheadRequest = async (
+    setDropdownData,
+    entryCount,
+    setEntryCount,
+    searchQuery,
+    setTitle,
+    setFusionDebugData,
+    updateRequest
+) => {
+    const login = localStorage.getItem('login') || '';
+    const password = localStorage.getItem('password') || '';
+    const url = localStorage.getItem('url') || '';
+    const pipeline = localStorage.getItem('pipeline') || '';
+    const proxyUrl = 'https://corsproxy.io/?'; // Adjust with your actual proxy URL
 
     const targetUrl = `https://${url}/api/apps/mouser/query/${pipeline}?q=${searchQuery}&debug=results&debug.explain.structured=true&fl=*,score&nocache=${getRandomNumber()}`;
     const encodedCredentials = btoa(`${login}:${password}`);
-    const currentTime = new Date();
-    const startTime = Date.now(); // Start time in milliseconds
+    const uniqueRequestId = Date.now(); // Unique ID for the request
+
+    // Add initial request with "loading..." placeholders
+    updateRequest(uniqueRequestId, {
+        queryType: "typeahead",
+        url: targetUrl.replace(/&debug=.*$/, ''),
+        responseCode: "loading...",
+        responseTime: "loading..."
+    });
+
+    const startTime = Date.now();
+    let response;
     try {
-        const response = await fetch(proxyUrl + targetUrl, {
+        response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
             method: 'GET',
-            cache: 'reload',
             headers: {
-                'Accept': '*/*',
-                'Pragma': 'no-cache',
-                'Cache-Control': 'max-age=0',
                 'Authorization': `Basic ${encodedCredentials}`,
+                // Include other necessary headers
             }
         });
-        // eslint-disable-next-line no-useless-concat
-        setRequestQuery(prev => "typeahead: " + targetUrl.replace(/&nocache=\d+$/, '') + " \n \n" + `${prev}`);
-        setEntryCount(entryCount + 1);
+
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+
         if (!response.ok) {
-            const errorText = await response.text(); // Get the response text even if the response is not ok
-            setResponseText(prevText => `${prevText}${prevText ? '\n' : ''}${entryCount}::${currentTime} ::  Error: ${response.status} - ${errorText}`);
-            setEntryCount(entryCount + 1);
-            return;
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-
         const data = await response.json();
-        // todo debug window
-        // setResponseText(prevText =>  targetUrl);
+
+        // Update dropdown, debug data, etc.
         setDropdownData(data);
         setFusionDebugData(data.responseHeader);
+        setTitle(`${duration} ms`);
+
+        // Update the request in state with actual response data
+        updateRequest(uniqueRequestId, {
+            queryType: "typeahead",
+            url: targetUrl.replace(/&debug=.*$/, ''),
+            responseCode: response.status,
+            responseTime: `${duration} ms`
+        });
     } catch (error) {
         console.error('Fetch error:', error);
-    } finally {
-        const endTime = Date.now();
-        const duration = endTime - startTime; // Duration in milliseconds
-        setTitle(`${duration} ms`);
+
+        updateRequest(uniqueRequestId, {
+            queryType: "typeahead",
+            url: targetUrl.replace(/&debug=.*$/, ''),
+            responseCode: response.status,
+            responseTime: `${ Date.now()- startTime}`,
+            errorDetails: `error`
+        });
     }
-}
+};
 
 
 

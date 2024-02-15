@@ -209,11 +209,6 @@ li {
     z-index: 1;
 }
 
-/* Setting column widths */
-.auth-table th, .auth-table td {
-    /* Example: setting the first column to be 200px wide */
-    /*width: 200px;*/
-}
 
 /*.auth-table tr:nth-child(0) td:{*/
 /*    width: 10px;*/
@@ -221,6 +216,12 @@ li {
 .top_div {
     display: flex;
     align-items: flex-start; /* Aligns items at the top */
+}
+
+
+.AuthForm, .DebugInfo {
+    max-height: 100%; /* Ensures these elements do not exceed the container's height */
+    overflow-y: auto; /* Adds scroll to these elements individually if their content exceeds their height */
 }
 .error-response-div {
     margin-left: 20px;

@@ -11,17 +11,10 @@ import RecsRequest from "./RecsRequest";
 import Popup from "./Popup";
 import {fetchSearchRecsRequest, fetchSearchRequest, fetchTypeAheadRequest} from "../../api/fetchRequests";
 
-
-
-
 const SearchBar = () => {
-
-
     const [recsResponse, setRecsResponse] = useState('');
     const [entryCount, setEntryCount] = useState(0);
     const [time, setTime] = useState('Search time');
-    const [responseText, setResponseText] = useState('');
-    const [requestQuery, setRequestQuery] = useState('');
     const [searchRecsType, setSearchRecsType] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [recsQuery, setRecsQuery] = useState('');
@@ -39,19 +32,35 @@ const SearchBar = () => {
     const [isRecsPopupOpen, setIsRecsPopupOpen] = useState(false);
     const [selectedItemRecs, setSelectedItemRecs] = useState('');
 
+    const [requests, setRequests] = useState([]);
+    const updateRequest = (id, requestData) => {
+        setRequests((prevRequests) => {
+            const existingIndex = prevRequests.findIndex((req) => req.id === id);
+            if (existingIndex > -1) {
+                // Update existing request
+                const updatedRequests = [...prevRequests];
+                updatedRequests[existingIndex] = { ...updatedRequests[existingIndex], ...requestData };
+                return updatedRequests;
+            } else {
+                // Add new request if it doesn't exist
+                return [{ id, ...requestData }, ...prevRequests];
+            }
+        });
+    };
+
 
     const debouncedTypeaheadSearch = useCallback(
         debounce(async (query) => {
             if (query.length > 2) { // Only search if the user has typed more than 2 characters
-                await fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, query, setTitle, setRequestQuery, setFusionDebugData);
+                await fetchTypeAheadRequest(setDropdownData,  entryCount, setEntryCount, query, setTitle,  setFusionDebugData, updateRequest);
             }
         }, 300),
-        [] // Dependency array, empty means the debounce function won't change
+        []
     );
     const debouncedSearch = useCallback(
         debounce(async (query) => {
             if (query.searchQuery.length > 2) { // Only search if the user has typed more than 2 characters
-                await fetchSearchRequest(query.searchQuery, setSearchResults, entryCount, setEntryCount, setTime, setResponseText, time, setRequestQuery, setFusionDebugData);
+                await fetchSearchRequest(query.searchQuery, setSearchResults, entryCount, setEntryCount, setTime, time, setFusionDebugData,updateRequest);
             }
         }, 300),
         [] // Dependency array, empty means the debounce function won't change
@@ -68,7 +77,7 @@ const SearchBar = () => {
     }, [recsQuery, debouncedFetchSearchRecs]);
     const fetchSearchRecs = async (query, searchRecsType) => {
         setIsLoading(true);
-        await fetchSearchRecsRequest(query, setRecsResponse, entryCount, setEntryCount, setTime, setResponseText, time, setRequestQuery, searchRecsType);
+        await fetchSearchRecsRequest(query, setRecsResponse, entryCount, setEntryCount, setTime, time, searchRecsType, updateRequest);
         setIsLoading(false);
     };
 
@@ -88,7 +97,6 @@ const SearchBar = () => {
         setIsLoading(false);
     };
 
-// Authentication state
     const [auth, setAuth] = useState({
         login: localStorage.getItem('login'),
         password: localStorage.getItem('password'),
@@ -118,7 +126,7 @@ const SearchBar = () => {
         <div>
             <div className="top_div">
                 <AuthForm auth={auth} setAuthField={updateAuthField} ></AuthForm>
-                <DebugInfo responseText={responseText} requestQuery={requestQuery}></DebugInfo>
+                <DebugInfo requests={requests}></DebugInfo>
             </div>
             <div class="container">
                 <div className="search-container">
@@ -151,7 +159,6 @@ const SearchBar = () => {
                                                             <td className="recs-link"
                                                                 onClick={() => {
                                                                 setSelectedItemDebugInfo(dropdownData.debug.explain[doc.id]);
-                                                                // setSelectedItemName(doc.display_name);
                                                                 setIsPopupOpen(true);
                                                             }}>{doc.display_name}</td>
                                                             <td width={150}>{doc.score}</td>
@@ -193,7 +200,7 @@ const SearchBar = () => {
                                                         onClick={() => {
                                                         setIsRecsPopupOpen(true);
                                                         setSearchRecsType('productid')
-                                                        setRecsQuery(doc.ProductId_l)
+                                                        fetchSearchRecs(doc.ProductId_l, 'productid')
                                                         setSelectedItemRecs(doc)
                                                     }
                                                     }>recs

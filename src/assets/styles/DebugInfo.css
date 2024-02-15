@@ -1,0 +1,24 @@
+.debug-table-container {
+    display: block;
+    max-height: 480px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.debug-table-container table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.debug-table-container thead th {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 2;
+}
+.query-type {
+    width: 20%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
