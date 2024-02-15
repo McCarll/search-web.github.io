@@ -148,7 +148,8 @@ const SearchBar = () => {
                                                     <tbody>
                                                     {group.doclist.docs.map((doc, idx) => (
                                                         <tr key={idx}>
-                                                            <td onClick={() => {
+                                                            <td className="recs-link"
+                                                                onClick={() => {
                                                                 setSelectedItemDebugInfo(dropdownData.debug.explain[doc.id]);
                                                                 // setSelectedItemName(doc.display_name);
                                                                 setIsPopupOpen(true);
@@ -181,23 +182,24 @@ const SearchBar = () => {
                                             <tbody>
                                             {searchResults?.response?.docs.map((doc, idx) => (
                                                 <tr key={idx}>
-                                                    <td onClick={() => {
+                                                    <td className="recs-link"
+                                                        onClick={() => {
                                                         setSelectedItemInfo(doc);
                                                         setSelectedItemInfoName(doc.ProductClassName_s);
                                                         setIsSearchPopupOpen(true);
                                                     }}>{doc.ProductClassName_s}</td>
                                                     <td>{doc.score}</td>
-                                                    <td onClick={() => {
+                                                    <td className="recs-link"
+                                                        onClick={() => {
                                                         setIsRecsPopupOpen(true);
                                                         setSearchRecsType('productid')
                                                         setRecsQuery(doc.ProductId_l)
-                                                        // getSearchRecsResults(doc.ProductId_l)
-                                                        // getSearchRecsResults()
                                                         setSelectedItemRecs(doc)
                                                     }
                                                     }>recs
                                                     </td>
-                                                    <td onClick={() => {
+                                                    <td className="recs-link"
+                                                        onClick={() => {
                                                         setSelectedItemDebugInfo(searchResults.debug.explain[doc.ProductId_l]);
                                                         setIsPopupOpen(true);
                                                     }

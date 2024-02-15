@@ -301,3 +301,12 @@ li {
     visibility: visible;
     opacity: 1;
 }
+
+.recs-link {
+    color: #0000EE; /* Traditional link color */
+    cursor: pointer;
+    text-decoration: none;
+}
+.recs-link:hover {
+    text-decoration: underline;
+}
