@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../assets/styles/SearchBar.css';
 
-const AuthForm = ({ auth }) => {
+const AuthForm = ({ auth, setAuthField }) => {
     return (
         <table className="auth-table">
             <tbody>
@@ -15,7 +15,8 @@ const AuthForm = ({ auth }) => {
                         className="auth-input"
                         type="text"
                         value={auth.login}
-                        onChange={(e) => setLogin(e.target.value)}
+                        onChange={(e) => setAuthField('login', e.target.value)}
+                        // onChange={(e) => auth.setLogin(e.target.value)}
                         placeholder="login"
                     />
                 </td>
@@ -27,7 +28,8 @@ const AuthForm = ({ auth }) => {
                         className="auth-input"
                         type="password"
                         value={auth.password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) =>  setAuthField('password', e.target.value)}
+                        // onChange={(e) =>  auth.setPassword(e.target.value)}
                         placeholder="password"
                     />
                 </td>
@@ -39,7 +41,8 @@ const AuthForm = ({ auth }) => {
                         className="auth-input"
                         type="text"
                         value={auth.url}
-                        onChange={(e) => setUrl(e.target.value)}
+                        onChange={(e) =>  setAuthField('url', e.target.value)}
+                        // onChange={(e) =>  auth.setUrl(e.target.value)}
                         placeholder="url"
                     />
                 </td>
@@ -52,7 +55,8 @@ const AuthForm = ({ auth }) => {
                         className="auth-input"
                         type="text"
                         value={auth.pipeline}
-                        onChange={(e) => setPipeline(e.target.value)}
+                        onChange={(e) =>  setAuthField('pipeline', e.target.value)}
+                        // onChange={(e) =>  auth.setPipeline(e.target.value)}
                         placeholder="typeahead profile"
                     />
                 </td>
@@ -65,7 +69,8 @@ const AuthForm = ({ auth }) => {
                         className="auth-input"
                         type="text"
                         value={auth.searchProfile}
-                        onChange={(e) => setSearchProfile(e.target.value)}
+                        onChange={(e) =>  setAuthField('searchProfile', e.target.value)}
+                        // onChange={(e) =>  auth.setSearchProfile(e.target.value)}
                         placeholder="search profile"
                     />
                 </td>
@@ -78,7 +83,8 @@ const AuthForm = ({ auth }) => {
                         className="auth-input"
                         type="text"
                         value={auth.recsProfile}
-                        onChange={(e) => setRecsProfile(e.target.value)}
+                        onChange={(e) =>  setAuthField('recsProfile', e.target.value)}
+                        // onChange={(e) =>  auth.setRecsProfile(e.target.value)}
                         placeholder="recs profile"
                     />
                 </td>

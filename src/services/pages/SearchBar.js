@@ -89,7 +89,7 @@ const SearchBar = () => {
     };
 
 // Authentication state
-    const [auth] = useState({
+    const [auth, setAuth] = useState({
         login: localStorage.getItem('login'),
         password: localStorage.getItem('password'),
         url: localStorage.getItem('url'),
@@ -108,10 +108,16 @@ const SearchBar = () => {
         localStorage.setItem('recsProfile', recsProfile);
     }, [auth]);
 
+    const updateAuthField = (field, value) => {
+        setAuth(prevAuth => ({
+            ...prevAuth,
+            [field]: value,
+        }));
+    };
     return (
         <div>
             <div className="top_div">
-                <AuthForm auth={auth} ></AuthForm>
+                <AuthForm auth={auth} setAuthField={updateAuthField} ></AuthForm>
                 <DebugInfo responseText={responseText} requestQuery={requestQuery}></DebugInfo>
             </div>
             <div class="container">
