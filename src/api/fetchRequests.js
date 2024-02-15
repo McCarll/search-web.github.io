@@ -1,4 +1,4 @@
-export const fetchSearchRequest = async (query, setSearchResults, entryCount, setEntryCount, setTime, setResponseText,time, setRequestQuery)  => {
+export const fetchSearchRequest = async (query, setSearchResults, entryCount, setEntryCount, setTime, setResponseText,time, setRequestQuery,setFusionDebugData)  => {
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
     var url = localStorage.getItem('url') || '';
@@ -36,6 +36,7 @@ export const fetchSearchRequest = async (query, setSearchResults, entryCount, se
 
         const data = await response.json();
         setSearchResults(data);
+        setFusionDebugData(data.responseHeader);
     } catch (error) {
         console.error('Fetch error:', error);
     } finally {
@@ -92,7 +93,7 @@ export const  fetchSearchRecsRequest = async (query, setRecsResponse, entryCount
     }
 }
 
-export const fetchTypeAheadRequest = async (setDropdownData, setResponseText, entryCount, setEntryCount, searchQuery, setTitle, setRequestQuery) => {
+export const fetchTypeAheadRequest = async (setDropdownData, setResponseText, entryCount, setEntryCount, searchQuery, setTitle, setRequestQuery,setFusionDebugData) => {
 
     var login = localStorage.getItem('login') || '';
     var password = localStorage.getItem('password') || '';
@@ -130,6 +131,7 @@ export const fetchTypeAheadRequest = async (setDropdownData, setResponseText, en
         // todo debug window
         // setResponseText(prevText =>  targetUrl);
         setDropdownData(data);
+        setFusionDebugData(data.responseHeader);
     } catch (error) {
         console.error('Fetch error:', error);
     } finally {

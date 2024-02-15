@@ -28,6 +28,7 @@ const SearchBar = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [dropdownData, setDropdownData] = useState(null);
+    const [fusionDebugData, setFusionDebugData] = useState(null);
     const [title, setTitle] = useState('Type ahead menu');
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
@@ -42,7 +43,7 @@ const SearchBar = () => {
     const debouncedTypeaheadSearch = useCallback(
         debounce(async (query) => {
             if (query.length > 2) { // Only search if the user has typed more than 2 characters
-                await fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, query, setTitle, setRequestQuery);
+                await fetchTypeAheadRequest(setDropdownData, setResponseText, entryCount, setEntryCount, query, setTitle, setRequestQuery, setFusionDebugData);
             }
         }, 300),
         [] // Dependency array, empty means the debounce function won't change
@@ -50,7 +51,7 @@ const SearchBar = () => {
     const debouncedSearch = useCallback(
         debounce(async (query) => {
             if (query.searchQuery.length > 2) { // Only search if the user has typed more than 2 characters
-                await fetchSearchRequest(query.searchQuery, setSearchResults, entryCount, setEntryCount, setTime, setResponseText, time, setRequestQuery);
+                await fetchSearchRequest(query.searchQuery, setSearchResults, entryCount, setEntryCount, setTime, setResponseText, time, setRequestQuery, setFusionDebugData);
             }
         }, 300),
         [] // Dependency array, empty means the debounce function won't change
@@ -223,8 +224,8 @@ const SearchBar = () => {
 
                             </td>
                             <td>Fusion debug
-                                {dropdownData && (
-                                    <JsonView src={dropdownData.responseHeader.params} collapsed={true}
+                                {fusionDebugData && (
+                                    <JsonView src={fusionDebugData.params} collapsed={true}
                                               className="custom-json-view"/>
 
                                 )}
