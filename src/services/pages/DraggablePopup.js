@@ -25,6 +25,8 @@ const DraggablePopup = ({ content, onClose }) => {
         <div
             ref={popupRef}
             style={{
+                width: '700px',
+                height: '300px',
                 position: 'fixed',
                 top: '50%',
                 left: '50%',
@@ -37,7 +39,7 @@ const DraggablePopup = ({ content, onClose }) => {
             }}
             onMouseDown={handleMouseDown}
         >
-            {content}
+            {content.errorDetails}
             <button onClick={onClose}>Close</button>
         </div>
     );

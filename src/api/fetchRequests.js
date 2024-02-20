@@ -39,10 +39,6 @@ export const fetchSearchRequest = async (
         const endTime = Date.now();
         const duration = endTime - startTime;
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const data = await response.json();
         setSearchResults(data);
         setFusionDebugData(data.responseHeader);
@@ -62,7 +58,9 @@ export const fetchSearchRequest = async (
             queryType: "search",
             url: targetUrl.replace(/&debug=.*$/, ''),
             responseCode: response.status,
-            responseTime: `${ Date.now()- startTime}`
+            responseTime: `${Date.now() - startTime}`,
+            responseErrorCode: `${error}`,
+            errorDetails: `${response.statusText}`
         });
     } finally {
         if (entryCount >= 1_000_000_000) {
@@ -115,9 +113,6 @@ export const fetchSearchRecsRequest = async (
         const endTime = Date.now();
         const duration = endTime - startTime;
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
 
         const data = await response.json();
         setRecsResponse(data);
@@ -137,7 +132,8 @@ export const fetchSearchRecsRequest = async (
             queryType: "recommendations",
             url: targetUrl.replace(/&debug=.*$/, ''),
             responseCode: response.status,
-            responseTime: `${ Date.now()- startTime}`
+            responseTime: `${Date.now() - startTime}`,
+            errorDetails: `${response.statusText}`
         });
     } finally {
         if (entryCount >= 1_000_000_000) {
@@ -146,7 +142,6 @@ export const fetchSearchRecsRequest = async (
         setEntryCount((prevCount) => prevCount + 1);
     }
 };
-
 
 
 export const fetchTypeAheadRequest = async (
@@ -178,6 +173,7 @@ export const fetchTypeAheadRequest = async (
 
     const startTime = Date.now();
     let response;
+
     try {
         response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
             method: 'GET',
@@ -189,11 +185,6 @@ export const fetchTypeAheadRequest = async (
 
         const endTime = Date.now();
         const duration = endTime - startTime;
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const data = await response.json();
 
         // Update dropdown, debug data, etc.
@@ -215,12 +206,11 @@ export const fetchTypeAheadRequest = async (
             queryType: "typeahead",
             url: targetUrl.replace(/&debug=.*$/, ''),
             responseCode: response.status,
-            responseTime: `${ Date.now()- startTime}`,
-            errorDetails: `error`
+            responseTime: `${Date.now() - startTime}`,
+            errorDetails: `${response.statusText}`
         });
     }
 };
-
 
 
 function getRandomNumber() {

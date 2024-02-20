@@ -6,8 +6,8 @@ const DebugInfo = ({ requests }) => {
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [popupContent, setPopupContent] = useState('');
 
-    const handleErrorClick = (errorText) => {
-        setPopupContent(errorText); // Set the content to be shown in the popup
+    const handleErrorClick = (response) => {
+        setPopupContent(response); // Set the content to be shown in the popup
         setIsPopupVisible(true); // Show the popup
     };
 
@@ -30,7 +30,7 @@ const DebugInfo = ({ requests }) => {
                             <td style={{width: '50%'}}>{request.url}</td>
                             <td>
                                 {request.responseCode !== 200 ? (
-                                    <span onClick={() => handleErrorClick(request.errorDetails)}
+                                    <span onClick={() => handleErrorClick(request)}
                                           style={{cursor: 'pointer'}}>
                                         {request.responseCode}
                                     </span>
