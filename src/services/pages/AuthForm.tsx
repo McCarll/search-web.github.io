@@ -1,11 +1,29 @@
 import React from 'react';
 import '../../assets/styles/SearchBar.css';
 
-const AuthForm = ({ auth, setAuthField }) => {
+// Define the shape of the auth object
+interface AuthFields {
+    login: string;
+    password: string;
+    url: string;
+    pipeline: string;
+    searchProfile: string;
+    recsProfile: string;
+}
+
+// Define the props expected by the AuthForm component
+interface AuthFormProps {
+    auth: AuthFields;
+    setAuthField: (field: keyof AuthFields, value: string) => void;
+}
+
+const AuthForm: React.FC<AuthFormProps> = ({auth, setAuthField}) => {
     return (
         <table className="auth-table">
             <tbody>
-            <th>request pattern:: https://<u>URL</u>/api/apps/app_name/query/<u>PROFILE</u>?q=<u>query</u></th>
+            <tr>
+                <th>request pattern:: https://<u>URL</u>/api/apps/app_name/query/<u>PROFILE</u>?q=<u>query</u></th>
+            </tr>
             <tr>
                 <td>
                     <b>login</b>
@@ -27,8 +45,7 @@ const AuthForm = ({ auth, setAuthField }) => {
                         className="auth-input"
                         type="password"
                         value={auth.password}
-                        onChange={(e) =>  setAuthField('password', e.target.value)}
-                        // onChange={(e) =>  auth.setPassword(e.target.value)}
+                        onChange={(e) => setAuthField('password', e.target.value)}
                         placeholder="password"
                     />
                 </td>
@@ -40,8 +57,7 @@ const AuthForm = ({ auth, setAuthField }) => {
                         className="auth-input"
                         type="text"
                         value={auth.url}
-                        onChange={(e) =>  setAuthField('url', e.target.value)}
-                        // onChange={(e) =>  auth.setUrl(e.target.value)}
+                        onChange={(e) => setAuthField('url', e.target.value)}
                         placeholder="url"
                     />
                 </td>
@@ -50,12 +66,11 @@ const AuthForm = ({ auth, setAuthField }) => {
                 <td>typeahead profile</td>
                 <td>
                     <input
-                        title={"Typeahead profile"}
+                        title="Typeahead profile"
                         className="auth-input"
                         type="text"
                         value={auth.pipeline}
-                        onChange={(e) =>  setAuthField('pipeline', e.target.value)}
-                        // onChange={(e) =>  auth.setPipeline(e.target.value)}
+                        onChange={(e) => setAuthField('pipeline', e.target.value)}
                         placeholder="typeahead profile"
                     />
                 </td>
@@ -64,31 +79,28 @@ const AuthForm = ({ auth, setAuthField }) => {
                 <td>search profile</td>
                 <td>
                     <input
-                        title={"Search profile"}
+                        title="Search profile"
                         className="auth-input"
                         type="text"
                         value={auth.searchProfile}
-                        onChange={(e) =>  setAuthField('searchProfile', e.target.value)}
-                        // onChange={(e) =>  auth.setSearchProfile(e.target.value)}
+                        onChange={(e) => setAuthField('searchProfile', e.target.value)}
                         placeholder="search profile"
                     />
                 </td>
             </tr>
             <tr>
-                <td>recommendation<br/> profile</td>
+                <td>recommendation profile</td>
                 <td>
                     <input
-                        title={"Recs profile"}
+                        title="Recs profile"
                         className="auth-input"
                         type="text"
                         value={auth.recsProfile}
-                        onChange={(e) =>  setAuthField('recsProfile', e.target.value)}
-                        // onChange={(e) =>  auth.setRecsProfile(e.target.value)}
+                        onChange={(e) => setAuthField('recsProfile', e.target.value)}
                         placeholder="recs profile"
                     />
                 </td>
             </tr>
-
             </tbody>
         </table>
     );

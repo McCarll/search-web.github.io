@@ -1,14 +1,24 @@
-import {useRef} from "react";
+import React, { useRef } from 'react';
+import { Request } from './DebugInfo';
 
-const DraggablePopup = ({ content, onClose }) => {
-    const popupRef = useRef(null);
+interface DraggablePopupProps {
+    content: Request | null;
+    onClose: () => void;
+}
 
-    const handleMouseDown = (e) => {
+const DraggablePopup: React.FC<DraggablePopupProps> = ({ content, onClose }) => {
+    const popupRef = useRef<HTMLDivElement>(null);
+
+    const handleMouseDown = (e: React.MouseEvent) => {
         const popup = popupRef.current;
+        if (!popup) return;
+
         let shiftX = e.clientX - popup.getBoundingClientRect().left;
         let shiftY = e.clientY - popup.getBoundingClientRect().top;
 
-        const handleMouseMove = (e) => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!popup) return;
+
             popup.style.left = e.pageX - shiftX + 'px';
             popup.style.top = e.pageY - shiftY + 'px';
         };
@@ -39,9 +49,10 @@ const DraggablePopup = ({ content, onClose }) => {
             }}
             onMouseDown={handleMouseDown}
         >
-            {content.errorDetails}
+            {content?.errorDetails}
             <button onClick={onClose}>Close</button>
         </div>
     );
 };
+
 export default DraggablePopup;

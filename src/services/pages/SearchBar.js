@@ -140,7 +140,7 @@ const SearchBar = () => {
                     </div>
                 )}
             </>
-            <div class="container">
+            <div className="container">
                 <div className="search-container">
                     <input
                         className="search-bar"

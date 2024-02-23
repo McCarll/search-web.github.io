@@ -2,13 +2,25 @@ import React, {useState} from 'react';
 import '../../assets/styles/DebugInfo.css';
 import DraggablePopup from "./DraggablePopup";
 
-const DebugInfo = ({ requests }) => {
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [popupContent, setPopupContent] = useState('');
+export interface Request {
+    queryType: string;
+    url: string;
+    responseCode: number;
+    responseTime: number;
+    errorDetails: string;
+}
 
-    const handleErrorClick = (response) => {
-        setPopupContent(response); // Set the content to be shown in the popup
-        setIsPopupVisible(true); // Show the popup
+interface DebugInfoProps {
+    requests: Request[]
+}
+
+const DebugInfo: React.FC<DebugInfoProps> = ({ requests }) => {
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    const [popupContent, setPopupContent] = useState<Request | null>(null);
+
+    const handleErrorClick = (request: Request) => {
+        setPopupContent(request);
+        setIsPopupVisible(true);
     };
 
     return (
@@ -53,7 +65,7 @@ const DebugInfo = ({ requests }) => {
         </>
     );
 };
-const getFontSizeStyle = (text) => {
+const getFontSizeStyle = (text: string) => {
     const threshold = 10;
     if (text.length > threshold) {
         return {fontSize: '0.8em'};
