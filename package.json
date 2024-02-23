@@ -19,8 +19,10 @@
     "react-force-graph": "^1.44.1",
     "react-scripts": "5.0.1",
     "react18-json-view": "latest",
-    "typescript": "^5.3.3",
     "web-vitals": "^2.1.4"
+  },
+  "overrides": {
+    "typescript": "^5.3.3"
   },
   "scripts": {
     "predeploy": "npm run build",
@@ -31,7 +33,7 @@
     "eject": "react-scripts eject",
     "update-dependecy": "npm update",
     "d3": "npm fund",
-    "ts": "npm install --save typescript @types/react @types/react-dom @types/node"
+    "ts": "npm install -D typescript"
   },
   "eslintConfig": {
     "extends": [
@@ -53,6 +55,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "eslint-plugin-react-hooks": "^4.6.0"
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "typescript": "^5.3.3"
   }
 }
