@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, {useState, useEffect, FormEvent, ChangeEvent} from 'react';
 
 interface PasswordPageProps {
     onPasswordSuccess: () => void;

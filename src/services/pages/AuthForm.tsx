@@ -14,6 +14,7 @@ interface AuthFields {
 // Define the props expected by the AuthForm component
 interface AuthFormProps {
     auth: AuthFields;
+    // eslint-disable-next-line no-unused-vars
     setAuthField: (field: keyof AuthFields, value: string) => void;
 }
 

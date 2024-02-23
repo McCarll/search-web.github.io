@@ -13,8 +13,8 @@ const DraggablePopup: React.FC<DraggablePopupProps> = ({ content, onClose }) => 
         const popup = popupRef.current;
         if (!popup) return;
 
-        let shiftX = e.clientX - popup.getBoundingClientRect().left;
-        let shiftY = e.clientY - popup.getBoundingClientRect().top;
+        const shiftX = e.clientX - popup.getBoundingClientRect().left;
+        const shiftY = e.clientY - popup.getBoundingClientRect().top;
 
         const handleMouseMove = (e: MouseEvent) => {
             if (!popup) return;
