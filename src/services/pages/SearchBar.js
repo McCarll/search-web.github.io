@@ -1,6 +1,6 @@
 import '../../assets/styles/SearchBar.css';
 import debounce from 'lodash.debounce';
-import {useCallback, useEffect,  useState} from "react";
+import React, {useCallback, useEffect,  useState} from "react";
 import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 import '../../assets/styles/TreeView.css';
@@ -10,6 +10,7 @@ import SearchPopup from "./SearchPopup";
 import RecsRequest from "./RecsRequest";
 import Popup from "./Popup";
 import {fetchSearchRecsRequest, fetchSearchRequest, fetchTypeAheadRequest} from "../../api/fetchRequests";
+import SemanticSearchGraph from "./SemanticSearchGraph";
 
 const SearchBar = () => {
     const [recsResponse, setRecsResponse] = useState('');
@@ -170,9 +171,9 @@ const SearchBar = () => {
                                                         <tr key={idx}>
                                                             <td className="recs-link"
                                                                 onClick={() => {
-                                                                setSelectedItemDebugInfo(dropdownData.debug.explain[doc.id]);
-                                                                setIsPopupOpen(true);
-                                                            }}>{doc.display_name}</td>
+                                                                    setSelectedItemDebugInfo(dropdownData.debug.explain[doc.id]);
+                                                                    setIsPopupOpen(true);
+                                                                }}>{doc.display_name}</td>
                                                             <td width={150}>{doc.score}</td>
                                                         </tr>
                                                     ))}
@@ -195,41 +196,41 @@ const SearchBar = () => {
                                     <p>Loading...</p>
                                 ) : (
                                     searchResults && (
-                                    <>
-                                        <b className="container-header">{time}</b>
-                                        <table>
-                                            <tbody>
-                                            {searchResults?.response?.docs.map((doc, idx) => (
-                                                <tr key={idx}>
-                                                    <td className="recs-link"
-                                                        onClick={() => {
-                                                        setSelectedItemInfo(doc);
-                                                        setSelectedItemInfoName(doc.ProductClassName_s);
-                                                        setIsSearchPopupOpen(true);
-                                                    }}>{doc.ProductClassName_s}</td>
-                                                    <td>{doc.score}</td>
-                                                    <td className="recs-link"
-                                                        onClick={() => {
-                                                        setIsRecsPopupOpen(true);
-                                                        setSearchRecsType('productid')
-                                                        fetchSearchRecs(doc.ProductId_l, 'productid')
-                                                        setSelectedItemRecs(doc)
-                                                    }
-                                                    }>recs
-                                                    </td>
-                                                    <td className="recs-link"
-                                                        onClick={() => {
-                                                        setSelectedItemDebugInfo(searchResults.debug.explain[doc.ProductId_l]);
-                                                        setIsPopupOpen(true);
-                                                    }
-                                                    }>debug
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            </tbody>
-                                        </table>
-                                    </>
-                                ))}
+                                        <>
+                                            <b className="container-header">{time}</b>
+                                            <table>
+                                                <tbody>
+                                                {searchResults?.response?.docs.map((doc, idx) => (
+                                                    <tr key={idx}>
+                                                        <td className="recs-link"
+                                                            onClick={() => {
+                                                                setSelectedItemInfo(doc);
+                                                                setSelectedItemInfoName(doc.ProductClassName_s);
+                                                                setIsSearchPopupOpen(true);
+                                                            }}>{doc.ProductClassName_s}</td>
+                                                        <td>{doc.score}</td>
+                                                        <td className="recs-link"
+                                                            onClick={() => {
+                                                                setIsRecsPopupOpen(true);
+                                                                setSearchRecsType('productid')
+                                                                fetchSearchRecs(doc.ProductId_l, 'productid')
+                                                                setSelectedItemRecs(doc)
+                                                            }
+                                                            }>recs
+                                                        </td>
+                                                        <td className="recs-link"
+                                                            onClick={() => {
+                                                                setSelectedItemDebugInfo(searchResults.debug.explain[doc.ProductId_l]);
+                                                                setIsPopupOpen(true);
+                                                            }
+                                                            }>debug
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                </tbody>
+                                            </table>
+                                        </>
+                                    ))}
 
                                 <SearchPopup
                                     isSearchPopupOpen={isSearchPopupOpen}
@@ -242,7 +243,7 @@ const SearchBar = () => {
                                     onClose={() => setIsRecsPopupOpen(false) & setRecsResponse(null) & setSelectedItemRecs(null)}
                                     recsResponse={recsResponse}
                                     sourceItem={selectedItemRecs}
-                                    setSearchRecsType = {setSearchRecsType}
+                                    setSearchRecsType={setSearchRecsType}
                                     isLoading={isLoading}
                                     setRecsQuery={setRecsQuery}
                                     time={time}
@@ -255,6 +256,11 @@ const SearchBar = () => {
                                     <JsonView src={fusionDebugData.params} collapsed={true}
                                               className="custom-json-view"/>
 
+                                )}
+                            </td>
+                            <td>Semantic Search graph
+                                { fusionDebugData?.params?.spell_correction_dot && (
+                                    <SemanticSearchGraph dotStrings={fusionDebugData.params.spell_correction_dot} />
                                 )}
                             </td>
                         </tr>
